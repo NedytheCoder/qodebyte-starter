@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/app/components/Input";
+import { useRouter } from "next/navigation";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
+import DynamicOTP from "../DynamicOTP";
 
 interface PasswordRequirements {
   hasMinLength: boolean;
@@ -14,6 +16,9 @@ interface PasswordRequirements {
 }
 
 const Page = () => {
+  const router = useRouter();
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [isSignupComplete, setIsSignupComplete] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -180,14 +185,17 @@ const Page = () => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    setIsLoading(true);
     try {
-      // TODO: Implement actual signup logic here
-      console.log("Signup attempt with:", formData);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // navigate("/login", { state: { registered: true } });
+      console.log("Form submitted:", formData);
+      setIsLoading(true);
+      // Simulate form processing for 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      console.log("Showing OTP modal for email:", formData.email);
+      setIsSignupComplete(true);
+      setShowOTPModal(true);
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("Registration error:", error);
       setErrors((prev) => ({
         ...prev,
         email: "An error occurred during signup",
@@ -246,26 +254,6 @@ const Page = () => {
     return isValid ? "success" : "error"; // Return appropriate class based on validation
   };
 
-  // Get error message for field
-  // const getErrorMessage = (fieldName: string, value: string) => {
-  //   if (!touched[fieldName as keyof typeof touched]) return "";
-
-  //   if (!value) {
-  //     return `${fieldName === "email" ? "Email" : fieldName} is required`;
-  //   }
-
-  //   switch (fieldName) {
-  //     case "email":
-  //       return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  //         ? "Please enter a valid email address"
-  //         : "";
-  //     case "confirmPassword":
-  //       return value !== formData.password ? "Passwords do not match" : "";
-  //     default:
-  //       return "";
-  //   }
-  // };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl space-y-6 bg-white p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-200 mx-auto">
@@ -316,11 +304,6 @@ const Page = () => {
                   className={getFieldValidity("firstName", formData.firstName)}
                   label="First Name"
                 />
-                {/* {touched.firstName && !formData.firstName && (
-                  <p className="mt-1 ml-3 text-sm text-red-600">
-                    First name is required
-                  </p>
-                )} */}
               </div>
 
               {/* Last Name */}
@@ -338,11 +321,6 @@ const Page = () => {
                   className={getFieldValidity("lastName", formData.lastName)}
                   label="Last Name"
                 />
-                {/* {touched.lastName && !formData.lastName && (
-                  <p className="mt-1 ml-3 text-sm text-red-600">
-                    Last name is required
-                  </p>
-                )} */}
               </div>
             </div>
 
@@ -365,11 +343,6 @@ const Page = () => {
                 className={getFieldValidity("email", formData.email)}
                 label="Email"
               />
-              {/* {touched.email && !formData.email && (
-                <p className="mt-1 ml-3 text-sm text-red-600">
-                  Email is required
-                </p>
-              )} */}
               {touched.email &&
                 formData.email &&
                 !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
@@ -581,6 +554,17 @@ const Page = () => {
           </div>
         </form>
       </div>
+      {showOTPModal && (
+        <DynamicOTP
+          description={`Enter the OTP sent to ${formData.email} to complete your registration`}
+          toRoute="/"
+          onVerify={async (otp) => {
+            console.log("Verifying OTP:", otp, "for email:", formData.email);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return true;
+          }}
+        />
+      )}
     </div>
   );
 };

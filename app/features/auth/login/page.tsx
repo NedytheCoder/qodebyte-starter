@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/app/components/Input";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
+import DynamicOTP from "../DynamicOTP";
 
 interface PasswordRequirements {
   hasMinLength: boolean;
@@ -14,6 +15,7 @@ interface PasswordRequirements {
 }
 
 const Page = () => {
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +23,7 @@ const Page = () => {
     password: "",
     confirmPassword: "",
     acceptTerms: false,
+    rememberMe: false,
   });
 
   const [touched, setTouched] = useState({
@@ -81,50 +84,19 @@ const Page = () => {
 
   // Check if form is valid
   const validateForm = () => {
-    // Only validate fields that have been marked as validated or are the current field
-    const fieldsToValidate = [...validatedFields];
-    if (currentField) {
-      fieldsToValidate.push(currentField);
-    }
-
-    let isValid = true;
-    for (const field of fieldsToValidate) {
-      const value = formData[field as keyof typeof formData];
-
-      switch (field) {
-        case "email":
-          isValid =
-            isValid && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value as string);
-          break;
-        case "password":
-          isValid = isValid && isPasswordValid(value as string);
-          break;
-        case "confirmPassword":
-          isValid = isValid && value === formData.password && value !== "";
-          break;
-        case "acceptTerms":
-          isValid = isValid && value === true;
-          break;
-        default:
-          isValid = isValid && (value as string).trim() !== "";
-      }
-
-      if (!isValid) break; // Stop at first invalid field
-    }
-
-    // Only check acceptTerms if all other fields are valid
-    if (isValid && fieldsToValidate.length >= 5) {
-      isValid = formData.acceptTerms;
-    }
+    // Enable button if both email and password have at least one character
+    const hasEmail = formData.email.trim().length > 0;
+    const hasPassword = formData.password.length > 0;
+    const isValid = hasEmail && hasPassword;
 
     setIsFormValid(isValid);
     return isValid;
   };
 
-  // Update form validity when form data or validation state changes
+  // Update form validity when email or password changes
   useEffect(() => {
     validateForm();
-  }, [formData, touched, currentField, validatedFields]);
+  }, [formData.email, formData.password]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -178,15 +150,22 @@ const Page = () => {
 
     setIsLoading(true);
     try {
-      // TODO: Implement actual signup logic here
-      console.log("Signup attempt with:", formData);
+      console.log("Login attempt with:", {
+        email: formData.email,
+        password: formData.password,
+        rememberMe: formData.rememberMe,
+      });
+
+      // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      // navigate("/login", { state: { registered: true } });
+
+      // Show OTP modal after successful login attempt
+      setShowOTPModal(true);
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("Login error:", error);
       setErrors((prev) => ({
         ...prev,
-        email: "An error occurred during signup",
+        email: "An error occurred during login",
       }));
     } finally {
       setIsLoading(false);
@@ -331,13 +310,23 @@ const Page = () => {
                   setValidatedFields((prev) => new Set([...prev, "password"]));
                 }}
                 onFocus={() => setIsPasswordFocused(true)}
-                error={
-                  touched.password &&
-                  !isPasswordValid(formData.password) &&
-                  formData.password.length > 0
-                }
+                error={touched.password && formData.password.length === 0}
                 label="Password"
+                helperText={
+                  touched.password && formData.password.length === 0
+                    ? "Password is required"
+                    : ""
+                }
               />
+
+              <div className="flex justify-end mt-1">
+                <Link
+                  href="/features/auth/forgotpassword"
+                  className="text-sm text-indigo-600 hover:text-indigo-500"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               {/* {isPasswordFocused && (
                 <div className="mt-2 text-sm text-gray-600">
@@ -404,8 +393,12 @@ const Page = () => {
               type="submit"
               label="Login"
               loading={isLoading}
-              disabled={!isFormValid}
-              className="w-full hover:bg-indigo-700"
+              disabled={!isFormValid || isLoading}
+              className={`w-full ${
+                isFormValid && !isLoading
+                  ? "hover:bg-indigo-700"
+                  : "opacity-70 cursor-not-allowed"
+              }`}
             />
           </div>
           {/* Social Login */}
@@ -448,6 +441,17 @@ const Page = () => {
           </div>
         </form>
       </div>
+      {showOTPModal && (
+        <DynamicOTP
+          description={`Enter the OTP sent to ${formData.email} to login`}
+          toRoute="/"
+          onVerify={async (otp: string) => {
+            console.log("Verifying OTP:", otp, "for email:", formData.email);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            return true;
+          }}
+        />
+      )}
     </div>
   );
 };

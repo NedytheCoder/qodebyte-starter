@@ -1,6 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import {
+  forwardRef,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+  useState,
+} from "react";
 import styles from "./Input.module.css";
 
 type Option = {
@@ -21,33 +26,54 @@ interface SelectDropdownProps {
 }
 
 interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "className"> {
-  label: string;
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "className"> {
+  label?: string;
+  helperText?: string;
   error?: boolean;
   className?: string;
+  inputRef?: (instance: HTMLInputElement | null) => void;
 }
 
-export function Input({ className = "", error = false, ...props }: InputProps) {
-  const inputClasses = [styles.inputGroup, className, error ? styles.error : ""]
-    .filter(Boolean)
-    .join(" ");
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className = "", error = false, label, inputRef, helperText, ...props }, ref) => {
+    const inputClasses = [styles.inputGroup, className, error ? styles.error : ""]
+      .filter(Boolean)
+      .join(" ");
 
-  // Extract input props to avoid passing them to the div
-  const { label, ...inputProps } = props;
+    return (
+      <div className={inputClasses}>
+        <input
+          ref={(el) => {
+            // Handle the forwarded ref
+            if (typeof ref === 'function') {
+              ref(el);
+            } else if (ref) {
+              ref.current = el;
+            }
+            // Handle the inputRef prop if provided
+            if (inputRef) {
+              inputRef(el);
+            }
+          }}
+          autoComplete="off"
+          className={error ? styles.error : ""}
+          {...props}
+        />
+        {label && (
+          <label htmlFor={props.name} className={error ? styles.error : ""}>
+            {label}
+            {props.required && <span className="text-red-500 ml-1">*</span>}
+          </label>
+        )}
+        {helperText && (
+          <p className="mt-1 text-sm text-red-500">{helperText}</p>
+        )}
+      </div>
+    );
+  }
+);
 
-  return (
-    <div className={inputClasses}>
-      <input
-        autoComplete="off"
-        className={error ? styles.error : ""}
-        {...inputProps}
-      />
-      <label htmlFor={inputProps.name} className={error ? styles.error : ""}>
-        {label}
-      </label>
-    </div>
-  );
-}
+Input.displayName = "Input";
 
 interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className"> {
