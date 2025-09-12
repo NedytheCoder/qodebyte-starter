@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Input from "@/app/components/Input";
-import Button from "@/app/components/Button";
+import { Input } from "@/app/components/Input";
+import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
 
 interface PasswordRequirements {
@@ -533,7 +533,7 @@ const Page = () => {
           </div>
           {/* Submit Button */}
           <div className="mt-6">
-            <Button
+            <RegularButton
               type="submit"
               label="Create account"
               loading={isLoading}
@@ -555,7 +555,7 @@ const Page = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button
+              <RegularButton
                 type="button"
                 onClick={() => console.log("Continue with Google")}
                 className="text-gray-700 border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-2"
@@ -566,7 +566,7 @@ const Page = () => {
                   </>
                 }
               />
-              <Button
+              <RegularButton
                 type="button"
                 onClick={() => console.log("Continue with Facebook")}
                 className="text-gray-700 border border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-2"

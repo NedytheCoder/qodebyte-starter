@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, ToastPosition } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const toastTypes = {
@@ -7,20 +7,22 @@ const toastTypes = {
   error: 'ERROR',
   info: 'INFO',
   warning: 'WARNING'
-};
+} as const;
+
+type ToastType = (typeof toastTypes)[keyof typeof toastTypes];
 
 const toastConfig = {
-  position: 'top-right',
+  position: 'top-right' as ToastPosition,
   autoClose: 5000,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: true,
   draggable: true,
   progress: undefined,
-  theme: 'light',
+  theme: 'light' as 'light' | 'dark' | 'colored',
 };
 
-const showToast = (message, type = toastTypes.info) => {
+const showToast = (message: string, type: ToastType = toastTypes.info) => {
   switch (type) {
     case toastTypes.success:
       toast.success(message, toastConfig);
