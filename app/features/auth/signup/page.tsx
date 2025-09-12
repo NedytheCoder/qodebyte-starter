@@ -16,7 +16,7 @@ interface PasswordRequirements {
 }
 
 const Page = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [isSignupComplete, setIsSignupComplete] = useState(false);
   const [formData, setFormData] = useState({
