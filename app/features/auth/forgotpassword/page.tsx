@@ -12,7 +12,7 @@ const Page = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  // const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
 
   const validateEmail = (email: string) => {

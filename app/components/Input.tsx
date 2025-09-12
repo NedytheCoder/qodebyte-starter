@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  forwardRef,
-  InputHTMLAttributes,
-  TextareaHTMLAttributes,
-  useState,
-} from "react";
+import { forwardRef, InputHTMLAttributes, useState } from "react";
 import styles from "./Input.module.css";
 
 type Option = {
@@ -35,8 +30,15 @@ interface InputProps
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className = "", error = false, label, inputRef, helperText, ...props }, ref) => {
-    const inputClasses = [styles.inputGroup, className, error ? styles.error : ""]
+  (
+    { className = "", error = false, label, inputRef, helperText, ...props },
+    ref
+  ) => {
+    const inputClasses = [
+      styles.inputGroup,
+      className,
+      error ? styles.error : "",
+    ]
       .filter(Boolean)
       .join(" ");
 
@@ -45,7 +47,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={(el) => {
             // Handle the forwarded ref
-            if (typeof ref === 'function') {
+            if (typeof ref === "function") {
               ref(el);
             } else if (ref) {
               ref.current = el;

@@ -49,7 +49,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
         inputRefs.current[index + 1]?.focus();
       } else if (index === 5) {
         // If this is the last input, directly call the submit handler
-        const otpCode = [...newOtp];
+        // const otpCode = [...newOtp];
         setTimeout(() => {
           handleSubmit(e as unknown as React.FormEvent);
         }, 0);
@@ -170,7 +170,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-gray-500">
-          Didn't receive a code?{" "}
+          Didn&apos;t receive a code?{" "}
           <button
             onClick={() => alert("Resend OTP functionality to be implemented")}
             className="font-medium text-blue-600 hover:text-blue-500"
