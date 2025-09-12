@@ -267,11 +267,11 @@ const Page = () => {
   // };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-[65%] space-y-8 bg-white p-8 rounded-xl shadow-lg transition-all duration-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl space-y-6 bg-white p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-200 mx-auto">
         {/* Header */}
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-2xl md:text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -300,9 +300,9 @@ const Page = () => {
         <form className="mt-8 space-y-3" onSubmit={handleSubmit} noValidate>
           <div className="flex flex-col gap-2 w-full">
             {/* First & Last Name */}
-            <div className="flex gap-2 w-full">
+            <div className="flex flex-col sm:flex-row gap-1 w-full">
               {/* First Name */}
-              <div className="w-full">
+              <div className="w-full sm:mb-0">
                 <Input
                   id="firstName"
                   name="firstName"
@@ -324,7 +324,7 @@ const Page = () => {
               </div>
 
               {/* Last Name */}
-              <div className="w-full">
+              <div className="w-full sm:mb-0">
                 <Input
                   id="lastName"
                   name="lastName"
@@ -405,7 +405,7 @@ const Page = () => {
               />
 
               {isPasswordFocused && (
-                <div className="mt-2 text-sm text-gray-600">
+                <div className="mt-2 text-xs sm:text-sm text-gray-600 space-y-1">
                   <p className="font-medium mb-1">Password must contain:</p>
                   <ul className="space-y-1">
                     <li
@@ -498,7 +498,7 @@ const Page = () => {
           {/* ✅ closes flex flex-col gap-2 w-full */}
           {/* Terms and Conditions */}
           <div className="flex items-start">
-            <div className="flex items-center h-5">
+            <div className="flex items-start mt-0.5">
               <input
                 id="acceptTerms"
                 name="acceptTerms"
@@ -510,7 +510,7 @@ const Page = () => {
                 } focus:ring-indigo-500 border-gray-300 rounded`}
               />
             </div>
-            <div className="ml-3 text-sm">
+            <div className="ml-3 text-xs sm:text-sm">
               <label
                 htmlFor="acceptTerms"
                 className="font-medium text-gray-700"
@@ -538,7 +538,7 @@ const Page = () => {
               label="Create account"
               loading={isLoading}
               disabled={!isFormValid}
-              className="w-full hover:bg-indigo-700"
+              className="w-full hover:bg-indigo-700 text-sm sm:text-base"
             />
           </div>
           {/* Social Login */}

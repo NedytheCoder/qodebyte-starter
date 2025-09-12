@@ -243,11 +243,11 @@ const Page = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-[65%] space-y-8 bg-white p-8 rounded-xl shadow-lg transition-all duration-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:w-[65%] space-y-6 sm:space-y-8 bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg transition-all duration-200 mx-2 sm:mx-4">
         {/* Header */}
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-4 sm:mt-6 text-center text-2xl md:text-3xl font-extrabold text-gray-900">
             Log into your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
@@ -263,9 +263,11 @@ const Page = () => {
 
         {/* Error Banner */}
         {errors.email && errors.email.includes("error occurred") && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4">
+          // <div className="bg-red-50 border-l-4 border-red-400 p-4">
+          <div className="bg-red-50 border-l-4 p-4">
             <div className="flex">
-              <div className="text-red-700">
+              <div className="">
+                {/* <div className="text-red-700"> */}
                 <p className="text-sm">{errors.email}</p>
               </div>
             </div>
@@ -273,7 +275,11 @@ const Page = () => {
         )}
 
         {/* Form */}
-        <form className="mt-8 space-y-3" onSubmit={handleSubmit} noValidate>
+        <form
+          className="mt-6 sm:mt-8 space-y-3 sm:space-y-4"
+          onSubmit={handleSubmit}
+          noValidate
+        >
           <div className="flex flex-col gap-2 w-full">
             {/* Email */}
             <div>
@@ -299,13 +305,13 @@ const Page = () => {
                   Email is required
                 </p>
               )} */}
-              {touched.email &&
+              {/* {touched.email &&
                 formData.email &&
                 !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
                   <span className="ml-3 text-sm text-red-600">
                     Please enter a valid email address
                   </span>
-                )}
+                )} */}
             </div>
 
             {/* Password */}
@@ -333,7 +339,7 @@ const Page = () => {
                 label="Password"
               />
 
-              {isPasswordFocused && (
+              {/* {isPasswordFocused && (
                 <div className="mt-2 text-sm text-gray-600">
                   <p className="font-medium mb-1">Password must contain:</p>
                   <ul className="space-y-1">
@@ -389,7 +395,7 @@ const Page = () => {
                     </li>
                   </ul>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
           {/* Submit Button */}
