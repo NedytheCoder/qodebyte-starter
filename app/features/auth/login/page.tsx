@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Input } from "@/app/components/Input";
+import { Input, PasswordInput } from "@/app/components/Input";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
 import DynamicOTP from "../DynamicOTP";
@@ -295,11 +295,10 @@ const Page = () => {
 
             {/* Password */}
             <div>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 required
                 value={formData.password}
                 onChange={handleChange}
@@ -310,7 +309,7 @@ const Page = () => {
                   setValidatedFields((prev) => new Set([...prev, "password"]));
                 }}
                 onFocus={() => setIsPasswordFocused(true)}
-                error={touched.password && formData.password.length === 0}
+                className={getFieldValidity("password", formData.password)}
                 label="Password"
                 helperText={
                   touched.password && formData.password.length === 0

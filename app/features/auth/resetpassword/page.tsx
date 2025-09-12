@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/app/components/Input";
+import { Input, PasswordInput } from "@/app/components/Input";
 import { RegularButton } from "@/app/components/Button";
 import { useRouter } from "next/navigation";
 
@@ -127,10 +127,9 @@ const Page = () => {
               <label htmlFor="password" className="sr-only">
                 New Password
               </label>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 autoComplete="new-password"
                 required
                 placeholder="New Password"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Input } from "@/app/components/Input";
+import { Input, PasswordInput } from "@/app/components/Input";
 import { useRouter } from "next/navigation";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
@@ -354,10 +354,9 @@ const Page = () => {
 
             {/* Password */}
             <div>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 autoComplete="new-password"
                 required
                 value={formData.password}
@@ -438,24 +437,17 @@ const Page = () => {
 
             {/* Confirm Password */}
             <div>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
-                  handleBlur(e);
-                  setValidatedFields(
-                    (prev) => new Set([...prev, "confirmPassword"])
-                  );
-                }}
+                onBlur={handleBlur}
                 error={
                   touched.confirmPassword &&
-                  formData.confirmPassword !== formData.password &&
-                  formData.confirmPassword.length > 0
+                  formData.password !== formData.confirmPassword
                 }
                 label="Confirm Password"
               />

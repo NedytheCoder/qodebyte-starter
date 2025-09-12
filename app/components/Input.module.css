@@ -4,15 +4,50 @@
     position: relative;
   }
   
+  .inputGroup {
+    position: relative;
+  }
+
+  .inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   .inputGroup input {
     font-size: 100%;
-    padding: 0.5em;
+    padding: 0.5em 2.5em 0.5em 1em;
     outline: none;
     border: 2px solid rgb(200, 200, 200);
     color: #000;
     border-radius: 999999px;
     width: 100%;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .passwordToggle {
+    position: absolute;
+    right: 0.75em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 0.25em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: color 0.2s ease;
+  }
+
+  .passwordToggle:hover {
+    color: #333;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .passwordToggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
   }
   
   .inputGroup input:focus {
