@@ -1,0 +1,65 @@
+.inputGroup {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 1em 0 1em 0;
+    position: relative;
+  }
+  
+  .inputGroup input {
+    font-size: 100%;
+    padding: 0.5em;
+    outline: none;
+    border: 2px solid rgb(200, 200, 200);
+    color: #000;
+    border-radius: 999999px;
+    width: 100%;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .inputGroup input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+  
+  /* Error state for the input */
+.inputGroup.error input {
+  border-color: #ef4444 !important;
+}
+
+.inputGroup.error input:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* For direct error class on input (backward compatibility) */
+.inputGroup input.error {
+  border-color: #ef4444 !important;
+}
+
+.inputGroup input.error:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+  
+  .inputGroup label {
+    font-size: 100%;
+    position: absolute;
+    left: 0;
+    padding: 0;
+    margin-top: .5em;
+    margin-left: 1em;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    color: rgb(180, 180, 180);
+  }
+  
+  .inputGroup :is(input:focus, input:valid)~label {
+    transform: translateY(-50%) scale(.9);
+    margin: 0em;
+    margin-left: 1.3em;
+    padding: 0.4em;
+    background-color: #fff;
+  }
+  
+  .inputGroup :is(input:focus, input:valid) {
+    border-color: rgb(150, 150, 200);
+  }
