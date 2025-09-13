@@ -20,7 +20,7 @@
     outline: none;
     border: 2px solid rgb(200, 200, 200);
     color: #000;
-    border-radius: 999999px;
+    border-radius: 5px;
     width: 100%;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }

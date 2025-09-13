@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { useRouter } from "next/navigation";
+import { RegularButton } from "@/app/components/Button";
 
 interface OTPModalProps {
   apiEndpoint?: string;
@@ -104,7 +105,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-800 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg w-[95%] md:w-[50%] relative">
+      <div className="bg-white p-2 md:p-8 rounded-lg w-[95%] md:w-[50%] relative">
         {onClose && (
           <button
             onClick={onClose}
@@ -135,12 +136,12 @@ const OTPModal: React.FC<OTPModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 w-full overflow-hidden">
-          <div className="flex justify-center items-center gap-2 w-full">
+          <div className="flex justify-center items-center w-full md:gap-2 gap-1">
             {otp.map((digit, index) => (
               <input
                 key={index}
                 type="text"
-                className="text-gray-800 border border-gray-300 rounded-full p-2 w-[50px] text-center"
+                className="text-gray-800 border border-gray-300 rounded-sm p-2 w-[50px] text-center"
                 value={digit}
                 onChange={(e) => handleChange(e, index)}
                 ref={setInputRef(index)}
@@ -156,15 +157,14 @@ const OTPModal: React.FC<OTPModalProps> = ({
           {error && (
             <p className="mt-4 text-center text-sm text-red-500">{error}</p>
           )}
-          <button
+          <RegularButton
             type="submit"
-            disabled={isSubmitting}
-            className={`mt-6 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 ${
+            disabled
+            label={isSubmitting ? "Verifying..." : "Verify OTP"}
+            className={`mt-6 w-full rounded-lg  px-4 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4 focus:ring-blue-300 ${
               isSubmitting ? "opacity-70 cursor-not-allowed" : ""
             }`}
-          >
-            {isSubmitting ? "Verifying..." : "Verify OTP"}
-          </button>
+          />
         </form>
         <p className="mt-4 text-center text-sm text-gray-500">
           Didn&apos;t receive a code?{" "}
