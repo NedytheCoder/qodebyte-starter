@@ -306,7 +306,7 @@ const Page = () => {
       {showOTPModal && (
         <DynamicOTP
           description={`Enter the OTP sent to ${formData.email} to login`}
-          toRoute="/"
+          toRoute="/features/auth/resetpassword"
           apiEndpoint="/api/auth/login"
           onVerify={async (otp: string) => {
             console.log("Verifying OTP:", otp, "for email:", formData.email);

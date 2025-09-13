@@ -311,12 +311,10 @@ const Page = () => {
                 onFocus={() => setIsPasswordFocused(true)}
                 className={getFieldValidity("password", formData.password)}
                 label="Password"
-                helperText={
-                  touched.password && formData.password.length === 0
-                    ? "Password is required"
-                    : ""
-                }
               />
+              {touched.password && formData.password.length === 0 && (
+                <span className="text-red-400">Password is required</span>
+              )}
 
               <div className="flex justify-end mt-1">
                 <Link

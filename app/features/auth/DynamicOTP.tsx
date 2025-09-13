@@ -140,8 +140,8 @@ const OTPModal: React.FC<OTPModalProps> = ({
             {otp.map((digit, index) => (
               <input
                 key={index}
-                type="text"
-                className="text-gray-800 border border-gray-300 rounded-sm p-2 w-[50px] text-center"
+                type="number"
+                className="text-gray-800 border border-gray-300 rounded-sm p-2 w-[50px] text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 value={digit}
                 onChange={(e) => handleChange(e, index)}
                 ref={setInputRef(index)}
@@ -149,11 +149,6 @@ const OTPModal: React.FC<OTPModalProps> = ({
             ))}
           </div>
 
-          <div className="mt-4 text-center text-sm">
-            <button className="text-blue-600 hover:text-blue-500">
-              Resend OTP
-            </button>
-          </div>
           {error && (
             <p className="mt-4 text-center text-sm text-red-500">{error}</p>
           )}
