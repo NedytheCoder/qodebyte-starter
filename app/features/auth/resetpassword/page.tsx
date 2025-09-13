@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Input, PasswordInput } from "@/app/components/Input";
 import { RegularButton } from "@/app/components/Button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import logo from "@/public/image.png";
 
 interface PasswordRequirements {
   hasMinLength: boolean;
@@ -101,8 +103,17 @@ const Page = () => {
 
   return (
     <div className="flex items-center bg-gray-800 h-screen justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+      <div className="w-full sm:max-w-2xl md:max-w-2xl lg:max-w-xl space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div>
+          <div className="flex justify-center items-center">
+            <Image
+              src={logo}
+              alt="Logo"
+              width={100}
+              height={100}
+              className="rounded-full text-center"
+            />
+          </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Reset Your Password
           </h2>

@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
 import DynamicOTP from "../DynamicOTP";
+import Toast, { showToast } from "@/app/components/Toast";
+import { toast } from "react-toastify";
+import Image from "next/image";
+import logo from "@/public/image.png";
 
 interface PasswordRequirements {
   hasMinLength: boolean;
@@ -190,7 +194,7 @@ const Page = () => {
       setIsLoading(true);
       // Simulate form processing for 2 seconds
       await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      toast.success("An OTP has been sent your email");
       console.log("Showing OTP modal for email:", formData.email);
       setIsSignupComplete(true);
       setShowOTPModal(true);
@@ -256,7 +260,16 @@ const Page = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-4xl space-y-6 bg-white p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-200 mx-auto">
+      <div className="w-full sm:max-w-2xl md:max-w-2xl lg:max-w-xl space-y-6 bg-white p-6 sm:p-8 rounded-xl shadow-lg transition-all duration-200 mx-auto">
+        <div className="flex items-center justify-center">
+          <Image
+            src={logo}
+            alt="Logo"
+            width={100}
+            height={100}
+            className="rounded-full text-center"
+          />
+        </div>
         {/* Header */}
         <div>
           <h2 className="mt-6 text-center text-2xl md:text-3xl font-extrabold text-gray-900">
@@ -545,6 +558,7 @@ const Page = () => {
             </div>
           </div>
         </form>
+        <Toast />
       </div>
       {showOTPModal && (
         <DynamicOTP

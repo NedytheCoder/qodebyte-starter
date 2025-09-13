@@ -5,6 +5,10 @@ import { Input, PasswordInput } from "@/app/components/Input";
 import { RegularButton } from "@/app/components/Button";
 import Link from "next/link";
 import DynamicOTP from "../DynamicOTP";
+import { toast } from "react-toastify";
+import Toast from "@/app/components/Toast";
+import Image from "next/image";
+import logo from "@/public/image.png";
 
 interface PasswordRequirements {
   hasMinLength: boolean;
@@ -155,7 +159,7 @@ const Page = () => {
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      toast.success("An OTP has been sent your email");
       // Show OTP modal after successful login attempt
       setShowOTPModal(true);
     } catch (error) {
@@ -210,7 +214,16 @@ const Page = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:w-[65%] space-y-6 sm:space-y-8 bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg transition-all duration-200 mx-2 sm:mx-4">
+      <div className="w-full sm:max-w-2xl md:max-w-2xl lg:max-w-xl space-y-6 sm:space-y-8 bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg transition-all duration-200 mx-2 sm:mx-4">
+        <div className="flex items-center justify-center">
+          <Image
+            src={logo}
+            alt="Logo"
+            width={100}
+            height={100}
+            className="rounded-full text-center"
+          />
+        </div>
         {/* Header */}
         <div>
           <h2 className="mt-4 sm:mt-6 text-center text-2xl md:text-3xl font-extrabold text-gray-900">
@@ -302,6 +315,7 @@ const Page = () => {
             Back to <Link href="/features/auth/login">Sign In</Link>
           </p>
         </div>
+        <Toast />
       </div>
       {showOTPModal && (
         <DynamicOTP
