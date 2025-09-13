@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, KeyboardEvent, ChangeEvent } from "react";
-import { Input } from "@/app/components/Input";
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { useRouter } from "next/navigation";
@@ -16,6 +15,7 @@ interface OTPModalProps {
 
 const OTPModal: React.FC<OTPModalProps> = ({
   description,
+  apiEndpoint,
   onVerify,
   onClose,
   toRoute,
@@ -73,6 +73,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
     console.log("Submitting OTP:", otpCode);
     try {
       setIsSubmitting(true);
+      console.log(apiEndpoint);
 
       // Call the onVerify prop if provided
       if (onVerify) {
@@ -103,7 +104,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-800 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg w-full max-w-md relative">
+      <div className="bg-white p-8 rounded-lg w-[95%] md:w-[50%] relative">
         {onClose && (
           <button
             onClick={onClose}
@@ -133,21 +134,17 @@ const OTPModal: React.FC<OTPModalProps> = ({
           <p className="mt-2 text-sm text-gray-600">{description}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6">
-          <div className="flex justify-center space-x-3">
+        <form onSubmit={handleSubmit} className="mt-6 w-full overflow-hidden">
+          <div className="flex justify-center items-center gap-2 w-full">
             {otp.map((digit, index) => (
-              <div key={index}>
-                <Input
-                  inputRef={setInputRef(index)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(e, index)}
-                  onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="h-14 w-12 rounded-lg text-center text-xl"
-                />
-              </div>
+              <input
+                key={index}
+                type="text"
+                className="text-gray-800 border border-gray-300 rounded-full p-2 w-[50px] text-center"
+                value={digit}
+                onChange={(e) => handleChange(e, index)}
+                ref={setInputRef(index)}
+              />
             ))}
           </div>
 
