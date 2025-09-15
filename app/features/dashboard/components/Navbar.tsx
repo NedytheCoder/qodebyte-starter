@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { FiSearch, FiBell, FiMenu, FiChevronDown, FiX } from "react-icons/fi";
+import {
+  FiSearch,
+  FiBell,
+  FiMenu,
+  FiChevronDown,
+  FiX,
+  FiGitBranch,
+} from "react-icons/fi";
 import { RegularButton } from "../../../components/Button";
 
 interface NavbarProps {
@@ -51,7 +58,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-10">
+    <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-1">
       <div className="mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -64,6 +71,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <span className="sr-only">Open main menu</span>
               <FiMenu className="block h-6 w-6" aria-hidden="true" />
             </button>
+
+            {/* Welcome Message - Hidden on mobile */}
+            <div className="hidden md:block ml-4 pl-56">
+              <p className="text-sm text-gray-500 leading-6">
+                <strong>Good Morning Admin</strong>
+                <br /> Welcome back, nice to see you again!
+              </p>
+            </div>
           </div>
 
           {/* Right side - Icons and profile */}
@@ -90,6 +105,15 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             >
               <FiBell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
+            </button>
+
+            {/* Branches Button */}
+            <button
+              type="button"
+              className="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              aria-label="View branches"
+            >
+              <FiGitBranch className="h-5 w-5" />
             </button>
 
             {/* Profile dropdown */}

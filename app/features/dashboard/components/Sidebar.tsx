@@ -10,41 +10,43 @@ import {
   FiSettings,
   FiSearch,
 } from "react-icons/fi";
-import { RegularButton } from "../../../components/Button";
 
 interface SidebarProps {
   onClose?: () => void;
 }
 
+import logo from "@/public/image.png";
+import Image from "next/image";
+
 const navItems = [
   {
     name: "Dashboard",
     icon: <FiHome size={20} />,
-    path: "/dashboard",
+    path: "/features/dashboard",
     exact: true,
   },
   {
     name: "Analytics",
     icon: <FiPieChart size={20} />,
-    path: "/dashboard/analytics",
+    path: "/features/dashboard/analytics",
     exact: false,
   },
   {
     name: "Customers",
     icon: <FiUsers size={20} />,
-    path: "/dashboard/customers",
+    path: "/features/dashboard/customers",
     exact: false,
   },
   {
     name: "Products",
     icon: <FiShoppingBag size={20} />,
-    path: "/dashboard/products",
+    path: "/features/dashboard/products",
     exact: false,
   },
   {
     name: "Settings",
     icon: <FiSettings size={20} />,
-    path: "/dashboard/settings",
+    path: "/features/dashboard/settings",
     exact: false,
   },
 ];
@@ -73,14 +75,20 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-white fixed top-0">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-indigo-600">QodeByte</h1>
+      <div className="p-6 border-b border-gray-200 flex justify-center items-center">
+        <Image
+          src={logo}
+          alt="logo"
+          width={50}
+          height={50}
+          className="rounded-full"
+        />
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />
