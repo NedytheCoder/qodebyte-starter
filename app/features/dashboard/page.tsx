@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import MobileBottomNav from "./components/MobileBottomNav";
 import { RegularButton, SecondaryButton } from "../../components/Button";
 import { Searchbar, Input } from "../../components/Input";
 import {
@@ -68,14 +69,20 @@ export default function DashboardPage() {
     []
   );
 
+  const [navOpen, setNavOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
       <div className="pt-16">
         <div className="flex">
           {/* Sidebar */}
-          <aside className="hidden md:block w-64 fixed left-0 border-r bg-white z-10">
+          <aside
+            className={`md:block w-64 fixed ${
+              navOpen ? "-left-full" : "left-0"
+            } md:left-0 border-r bg-white z-10 transition-all duration-400 ease-in-out`}
+          >
             <Sidebar />
           </aside>
 
@@ -83,7 +90,7 @@ export default function DashboardPage() {
           <main className="flex-1 w-full md:ml-64">
             <div className="px-4 sm:px-6 lg:px-8 py-6">
               {/* Header Row */}
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
                 <div>
                   <h1 className="text-lg font-semibold text-gray-900">
                     Dashboard
@@ -95,7 +102,7 @@ export default function DashboardPage() {
                       key={f.key}
                       label={f.label}
                       onClick={() => setActiveTime(f.key)}
-                      className={`!px-3 !py-1.5 !text-sm !min-w-0 !shadow-none ${
+                      className={`!px-2 !py-1 !text-sm !min-w-0 !shadow-none md:px-3 md:py-2 ${
                         activeTime === f.key
                           ? "!bg-gray-900 !text-white"
                           : "!bg-white !text-gray-700 border !border-gray-200"
@@ -106,12 +113,12 @@ export default function DashboardPage() {
               </div>
 
               {/* Tabs: Section Switcher */}
-              <div className="overflow-x-auto">
-                <div className="flex justify-between border rounded-lg bg-white p-1 w-full sm:min-w-0">
+              <div>
+                <div className="flex flex-wrap md:justify-between gap-2 border rounded-lg bg-white p-1 w-full">
                   {SECTION_TABS.map((t) => (
                     <button
                       key={t.key}
-                      className={`px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
+                      className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
                         activeSection === t.key
                           ? "bg-indigo-600 text-white"
                           : "text-gray-600 hover:bg-gray-100"
@@ -147,7 +154,7 @@ export default function DashboardPage() {
               {activeSection === "overview" && (
                 <div className="mt-6 space-y-6">
                   {/* Big Bar Chart */}
-                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                  <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">
                       Today’s Overview
                     </h3>
@@ -407,6 +414,8 @@ export default function DashboardPage() {
           </main>
         </div>
       </div>
+      {/* Mobile bottom navigation */}
+      <MobileBottomNav navOpen={navOpen} setNavOpen={setNavOpen} />
     </div>
   );
 }

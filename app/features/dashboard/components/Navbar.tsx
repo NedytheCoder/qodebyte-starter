@@ -62,16 +62,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       <div className="mx-auto px-2 sm:px-4 lg:px-6">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden menu-button"
-              onClick={onMenuClick}
-              aria-label="Toggle menu"
-            >
-              <span className="sr-only">Open main menu</span>
-              <FiMenu className="block h-6 w-6" aria-hidden="true" />
-            </button>
-
+            <p className="md:hidden w-full text-sm text-gray-500 leading-6">
+              <strong>Good Morning Admin</strong>
+            </p>
             {/* Welcome Message - Hidden on mobile */}
             <div className="hidden md:block ml-4 pl-56">
               <p className="text-sm text-gray-500 leading-6">
@@ -84,18 +77,6 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
           {/* Right side - Icons and profile */}
           <div className="flex items-center space-x-4">
             {/* Mobile search button */}
-            <button
-              type="button"
-              onClick={toggleMobileSearch}
-              className="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 md:hidden"
-              aria-label="Search"
-            >
-              {showMobileSearch ? (
-                <FiX className="h-5 w-5" />
-              ) : (
-                <FiSearch className="h-5 w-5" />
-              )}
-            </button>
 
             {/* Notifications */}
             <button
@@ -178,7 +159,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         </div>
 
         {/* Mobile search */}
-        {showMobileSearch && (
+        {/* {showMobileSearch && (
           <div className="pb-3 md:hidden">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -192,7 +173,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               />
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </nav>
   );
