@@ -72,7 +72,10 @@ export default function DashboardPage() {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div
+      className="min-h-screen bg-gray-50 overflow-x-hidden"
+      onClick={() => setNavOpen(!navOpen)}
+    >
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
       <div className="pt-16">
@@ -80,7 +83,7 @@ export default function DashboardPage() {
           {/* Sidebar */}
           <aside
             className={`md:block w-64 fixed ${
-              navOpen ? "-left-full" : "left-0"
+              !navOpen ? "-left-full" : "left-0"
             } md:left-0 border-r bg-white z-10 transition-all duration-400 ease-in-out`}
           >
             <Sidebar />
