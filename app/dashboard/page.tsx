@@ -75,13 +75,14 @@ const Page = () => {
     <main className="flex-1 w-full md:ml-64">
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3 py-3">
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Dashboard</h1>
           </div>
-          <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-hide md:flex md:justify-end">
-            <div className="inline-flex gap-2 border rounded-lg bg-white p-1 w-full md:w-auto">
-              {TIME_FILTERS.map((t) => (
+          <div className="w-full md:flex md:justify-end mb-4">
+            <div className="w-full md:w-auto border rounded-lg bg-white p-1">
+              <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+                {TIME_FILTERS.map((t) => (
                 <button
                   key={t.key}
                   className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
@@ -93,7 +94,8 @@ const Page = () => {
                 >
                   {t.label}
                 </button>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -146,9 +148,10 @@ const Page = () => {
           )}
         </div>
         {/* Tabs: Section Switcher */}
-        <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <div className="inline-flex gap-2 border rounded-lg bg-white p-1 w-full md:justify-between">
-            {SECTION_TABS.map((t) => (
+        <div className="w-full mb-4">
+          <div className="w-full border rounded-lg bg-white p-1">
+            <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+              {SECTION_TABS.map((t) => (
               <button
                 key={t.key}
                 className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
@@ -160,7 +163,8 @@ const Page = () => {
               >
                 {t.label}
               </button>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 

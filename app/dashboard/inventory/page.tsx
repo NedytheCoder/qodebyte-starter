@@ -99,21 +99,25 @@ const Page = () => {
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Inventory</h1>
           </div>
-          <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-hide">
-            <div className="inline-flex gap-2 border rounded-lg bg-white p-1 mt-2">
-              {TIME_FILTERS.map((t) => (
-                <button
-                  key={t.key}
-                  className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors hidden md:block ${
-                    activeTime === t.key
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                  onClick={() => setActiveTime(t.key)}
-                >
-                  {t.label}
-                </button>
-              ))}
+          <div className="w-full md:flex md:justify-end mb-4">
+            <div className="w-full md:w-auto border rounded-lg bg-white p-1">
+              <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div className="flex gap-2">
+                  {TIME_FILTERS.map((t) => (
+                    <button
+                      key={t.key}
+                      className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
+                        activeTime === t.key
+                          ? "bg-indigo-600 text-white"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                      onClick={() => setActiveTime(t.key)}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             {activeSection === "products" && addProduct && (
               <RegularButton
@@ -212,21 +216,25 @@ const Page = () => {
         </div>
 
         {/* Tabs: Section Switcher */}
-        <div className="w-full overflow-x-auto whitespace-nowrap scrollbar-hide">
-          <div className="inline-flex gap-2 border rounded-lg bg-white p-1 w-full">
-            {SECTION_TABS.map((t) => (
-              <button
-                key={t.key}
-                className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                  activeSection === t.key
-                    ? "bg-indigo-600 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
-                }`}
-                onClick={() => setActiveSection(t.key)}
-              >
-                {t.label}
-              </button>
-            ))}
+        <div className="w-full mb-4">
+          <div className="w-full border rounded-lg bg-white p-1">
+            <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <div className="flex gap-2">
+                {SECTION_TABS.map((t) => (
+                  <button
+                    key={t.key}
+                    className={`px-2 py-1 md:px-4 md:py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
+                      activeSection === t.key
+                        ? "bg-indigo-600 text-white"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setActiveSection(t.key)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
