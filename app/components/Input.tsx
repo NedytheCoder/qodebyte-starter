@@ -27,6 +27,8 @@ interface InputProps
   error?: boolean;
   className?: string;
   inputRef?: (instance: HTMLInputElement | null) => void;
+  checked?: boolean;
+  onClick?: () => void;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -130,7 +132,9 @@ export function SelectDropdown({
     <div className={inputClasses}>
       <select
         autoComplete="off"
-        className={`${error ? styles.error : ""} bg-gray-700 p-4 rounded-md`}
+        className={`${
+          error ? styles.error : ""
+        } ${className} p-2 rounded-md border-2`}
         onChange={handleChange}
         {...selectProps}
       >
@@ -249,7 +253,7 @@ export function Searchbar({
         />
         <button
           type="submit"
-          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-2 rounded-full"
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-2 rounded-sm"
           aria-label="Search"
         >
           <svg
@@ -269,5 +273,33 @@ export function Searchbar({
         </button>
       </div>
     </form>
+  );
+}
+
+export function Switch({
+  className = "",
+  error = false,
+  checked,
+  disabled,
+  onClick,
+  ...props
+}: InputProps) {
+  return (
+    <label
+      className={`relative items-center ${
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+      } ${className}`}
+      onClick={onClick}
+    >
+      <input
+        type="checkbox"
+        value=""
+        checked={checked}
+        className="sr-only peer disabled:opacity-50 disabled:cursor-not-allowed"
+        {...props}
+        disabled={disabled}
+      />
+      <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-16 h-8 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-6 after:w-6 after:top-1 after:left-1 peer-checked:after:translate-x-8 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
+    </label>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Searchbar } from "@/app/components/Input";
 import { useState, useRef, useEffect } from "react";
 import {
   FiSearch,
@@ -9,14 +10,12 @@ import {
   FiX,
   FiGitBranch,
 } from "react-icons/fi";
-import { RegularButton } from "../../../components/Button";
 
 interface NavbarProps {
   onMenuClick?: () => void;
 }
 
 export default function Navbar({ onMenuClick }: NavbarProps) {
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -58,20 +57,27 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-1">
-      <div className="mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex justify-between h-16">
+    <nav className="fixed md:top-5 left-0 md:left-72 md:right-9 right-0 bg-white z-1 shadow-sm rounded">
+      <div className="mx-auto px-4 lg:px-6 py-4 md:py-4">
+        <div className="flex justify-between">
           <div className="flex items-center">
             <p className="md:hidden w-full text-sm text-gray-500 leading-6">
               <strong>Good Morning Admin</strong>
             </p>
             {/* Welcome Message - Hidden on mobile */}
-            <div className="hidden md:block ml-4 pl-56">
+            <div className="hidden md:block">
               <p className="text-sm text-gray-500 leading-6">
-                <strong>Good Morning Admin</strong>
-                <br /> Welcome back, nice to see you again!
+                <span className="font-semibold">Good Morning Admin</span>
+                <br />{" "}
+                <span className="text-xs">
+                  Welcome back, nice to see you again!
+                </span>
               </p>
             </div>
+          </div>
+
+          <div className="hidden md:block text-black">
+            <Searchbar className="pr-13" placeholder="Search..." />
           </div>
 
           {/* Right side - Icons and profile */}

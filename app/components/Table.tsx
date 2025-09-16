@@ -66,14 +66,14 @@ export function Table<T extends object>({
 
   return (
     <div className={`overflow-x-auto ${className}`}>
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-800">
+      <table className="min-w-full divide-y divide-gray-200 border-1 border-gray-700 rounded-lg">
+        <thead className="rounded">
           <tr>
             {columns.map((column, index) => (
               <th
                 key={index}
                 scope="col"
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider ${
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider ${
                   column.sortable
                     ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                     : ""

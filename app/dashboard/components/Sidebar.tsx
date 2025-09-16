@@ -9,7 +9,11 @@ import {
   FiShoppingBag,
   FiSettings,
   FiSearch,
+  FiBox,
 } from "react-icons/fi";
+import { RiStockLine } from "react-icons/ri";
+import { BiSolidReport } from "react-icons/bi";
+import { MdGroups } from "react-icons/md";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -22,31 +26,49 @@ const navItems = [
   {
     name: "Dashboard",
     icon: <FiHome size={20} />,
-    path: "/features/dashboard",
+    path: "/dashboard",
     exact: true,
   },
   {
-    name: "Analytics",
+    name: "Inventory",
+    icon: <FiBox size={20} />,
+    path: "/dashboard/inventory",
+    exact: true,
+  },
+  {
+    name: "Sales and Orders",
     icon: <FiPieChart size={20} />,
-    path: "/features/dashboard/analytics",
+    path: "/dashboard/sales",
     exact: false,
   },
   {
     name: "Customers",
     icon: <FiUsers size={20} />,
-    path: "/features/dashboard/customers",
+    path: "/dashboard/customers",
     exact: false,
   },
   {
-    name: "Products",
-    icon: <FiShoppingBag size={20} />,
-    path: "/features/dashboard/products",
+    name: "Finance",
+    icon: <RiStockLine size={20} />,
+    path: "/dashboard/finance",
+    exact: false,
+  },
+  {
+    name: "Staffs",
+    icon: <MdGroups size={20} />,
+    path: "/dashboard/staff",
+    exact: false,
+  },
+  {
+    name: "Reports",
+    icon: <BiSolidReport size={20} />,
+    path: "/dashboard/reports",
     exact: false,
   },
   {
     name: "Settings",
     icon: <FiSettings size={20} />,
-    path: "/features/dashboard/settings",
+    path: "/dashboard/settings",
     exact: false,
   },
 ];
@@ -75,7 +97,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white fixed top-0">
+    <div className="h-screen flex flex-col bg-white fixed top-0 px-8">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200 flex justify-center items-center">
         <Image
@@ -88,7 +110,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       </div>
 
       {/* Search */}
-      <div className="p-4">
+      <div className="hidden">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />

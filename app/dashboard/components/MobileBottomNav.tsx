@@ -25,7 +25,7 @@ export default function MobileBottomNav({
         <div className="h-16 relative">
           <div className="grid grid-cols-4 h-full text-xs text-gray-600">
             <Link
-              href="#"
+              href="/dashboard/inventory"
               className="flex flex-col items-center justify-center"
             >
               <FiBox className="mb-0.5" />
