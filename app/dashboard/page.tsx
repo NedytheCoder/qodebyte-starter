@@ -1515,7 +1515,7 @@ const Page = () => {
                   className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="gap-3 hidden md:flex">
                 <SelectDropdown
                   options={[
                     { value: "all", label: "All Categories" },

@@ -18,7 +18,7 @@ export default function DashboardPage({
     <div
       className="min-h-screen bg-gray-50 overflow-x-hidden"
       onClick={() => {
-        setNavOpen(false);
+        if (navOpen) setNavOpen(!navOpen);
       }}
     >
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
