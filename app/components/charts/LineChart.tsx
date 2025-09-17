@@ -36,8 +36,19 @@ export default function LineChart({
       <ResponsiveContainer width={width} height={height}>
         <RechartsLineChart data={data}>
           {showGrid && <CartesianGrid strokeDasharray={gridStrokeDasharray} />}
-          <XAxis dataKey={xAxisKey} />
-          <YAxis />
+          <XAxis
+            dataKey={xAxisKey}
+            tick={{
+              fontSize: "0.75rem",
+              className: "text-[10px] sm:text-xs",
+            }}
+          />
+          <YAxis
+            tick={{
+              fontSize: "0.75rem",
+              className: "text-[10px] sm:text-xs",
+            }}
+          />
           {showTooltip && <Tooltip />}
           {showLegend && <Legend />}
           <Line

@@ -8,13 +8,14 @@ type Option = {
   label: string;
 };
 
-interface SelectDropdownProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
+interface SelectDropdownProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange"> {
   options: Option[];
   value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
-  label?: string;
+  label?: React.ReactNode;
   error?: boolean;
 }
 
@@ -117,17 +118,18 @@ export function SelectDropdown({
   placeholder,
   ...props
 }: SelectDropdownProps) {
-  const inputClasses = [
-    "relative inline-block w-full",
-    className,
-  ].filter(Boolean).join(" ");
+  const inputClasses = ["relative inline-block w-full", className]
+    .filter(Boolean)
+    .join(" ");
 
   const selectClasses = [
     "block w-full h-8 pl-3 pr-8 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded-md",
     "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
     error ? "border-red-500" : "",
-    props.disabled ? "bg-gray-100 cursor-not-allowed opacity-75" : ""
-  ].filter(Boolean).join(" ");
+    props.disabled ? "bg-gray-100 cursor-not-allowed opacity-75" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const { label, ...selectProps } = props;
 
@@ -155,8 +157,8 @@ export function SelectDropdown({
             </option>
           )}
           {options.map((option) => (
-            <option 
-              key={option.value} 
+            <option
+              key={option.value}
               value={option.value}
               className="text-gray-900"
             >
@@ -164,15 +166,6 @@ export function SelectDropdown({
             </option>
           ))}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
       </div>
     </div>
   );
@@ -323,7 +316,7 @@ export function Switch({
         {...props}
         disabled={disabled}
       />
-      <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-16 h-8 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-6 after:w-6 after:top-1 after:left-1 peer-checked:after:translate-x-8 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
+      <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-12 h-6 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-4 after:w-4 after:top-1 after:left-1 peer-checked:after:translate-x-8 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
     </label>
   );
 }

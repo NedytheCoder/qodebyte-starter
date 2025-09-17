@@ -111,7 +111,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
             <Link
               href="/dashboard"
               onClick={handleItemClick}
-              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center px-4 py-3 rounded-md text-xs md:text-sm font-medium transition-colors ${
                 usePathname() === "/dashboard"
                   ? "bg-indigo-50 text-indigo-700"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -137,7 +137,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 <Link
                   href={item.path}
                   onClick={handleItemClick}
-                  className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center px-4 py-3 rounded-md text-xs md:text-sm font-medium transition-colors ${
                     active
                       ? "bg-indigo-50 text-indigo-700"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -160,10 +160,10 @@ export default function Sidebar({ onClose }: SidebarProps) {
             <Link
               href="/dashboard/reports"
               onClick={handleItemClick}
-              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center px-4 py-3 rounded-md text-xs md:text-sm font-medium transition-colors ${
                 usePathname() === "/dashboard/reports"
                   ? "bg-indigo-50 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
               <span
@@ -182,7 +182,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
             <Link
               href="/dashboard/settings"
               onClick={handleItemClick}
-              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center px-4 py-3 rounded-md text-xs md:text-sm font-medium transition-colors ${
                 usePathname() === "/dashboard/settings"
                   ? "bg-indigo-50 text-indigo-700"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"

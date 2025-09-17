@@ -23,7 +23,7 @@ export default function DashboardPage({
     >
       <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-      <div className="pt-16 md:pt-28">
+      <div className="pt-15 md:pt-24">
         <div className="flex">
           {/* Sidebar */}
           <aside

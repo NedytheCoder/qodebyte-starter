@@ -264,7 +264,7 @@ const Page = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 md:mb-7 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-7">
           {/* Overview */}
           {num.map((n) => (
             <div
@@ -301,7 +301,7 @@ const Page = () => {
                 >
                   <p>{t.label}</p>
                   {t.key === "stock" && (
-                    <span className="absolute top-0 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 rounded-full text-white text-xs">
+                    <span className="absolute top-0 -right-1 md:-right-2 w-4 h-4 md:w-5 md:h-5 flex items-center justify-center bg-red-500 rounded-full text-white text-[10px] sm:text-xs">
                       4
                     </span>
                   )}
