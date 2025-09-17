@@ -95,7 +95,7 @@ const Page = () => {
     <main className="flex-1 w-full md:ml-64">
       <div className="px-4 sm:px-6 lg:px-8 py-6">
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between my-2 gap-3">
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Inventory</h1>
           </div>
@@ -177,7 +177,7 @@ const Page = () => {
                   key={n}
                 >
                   <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm">
+                    <table className="min-w-full text-sm text-gray-500">
                       <thead>
                         <tr className="text-left text-gray-500">
                           <th className="py-2">Product</th>

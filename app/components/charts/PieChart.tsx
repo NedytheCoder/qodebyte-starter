@@ -20,21 +20,10 @@ export default function PieChart({
   showTooltip = true,
   strokeColor = "#ffffff",
   fillColor = "#8884d8",
+  colors = ["#10B981", "#EF4444"],
   className,
   children,
-}: ChartComponentProps) {
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#8dd1e1",
-    "#a4de6c",
-    "#d0ed57",
-    "#d0ed57",
-    "#a28fd0",
-    "#ffbb28",
-  ];
+}: ChartComponentProps & { colors?: string[] }) {
 
   return (
     <div

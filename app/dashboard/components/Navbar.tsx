@@ -1,15 +1,13 @@
 "use client";
 
 import { Searchbar } from "@/app/components/Input";
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import {
-  FiSearch,
-  FiBell,
-  FiMenu,
-  FiChevronDown,
-  FiX,
-  FiGitBranch,
-} from "react-icons/fi";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { FiSettings } from "react-icons/fi";
+import { FaRegCircleQuestion } from "react-icons/fa6";
+import { FiBell, FiChevronDown, FiGitBranch } from "react-icons/fi";
+import { PiSignOut } from "react-icons/pi";
 
 interface NavbarProps {
   onMenuClick?: () => void;
@@ -52,9 +50,16 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   }, []);
 
   // Toggle mobile search
-  const toggleMobileSearch = () => {
-    setShowMobileSearch(!showMobileSearch);
-  };
+  // const toggleMobileSearch = () => {
+  //   setShowMobileSearch(!showMobileSearch);
+  // };
+
+  const links = [
+    { label: "Your Profile", icon: <FaRegCircleUser /> },
+    { label: "Settings", icon: <FiSettings /> },
+    { label: "Help and Support", icon: <FaRegCircleQuestion /> },
+    { label: "Sign out", icon: <PiSignOut /> },
+  ];
 
   return (
     <nav className="fixed md:top-5 left-0 md:left-72 md:right-9 right-0 bg-white z-1 shadow-sm rounded">
@@ -128,36 +133,44 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               {/* Dropdown menu */}
               {isProfileOpen && (
                 <div
-                  className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                  className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white focus:outline-none z-50 py-3"
                   role="menu"
                   aria-orientation="vertical"
                   aria-labelledby="user-menu-button"
                   tabIndex={-1}
                 >
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    tabIndex={-1}
-                  >
-                    Your Profile
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    tabIndex={-1}
-                  >
-                    Settings
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                    tabIndex={-1}
-                  >
-                    Sign out
-                  </a>
+                  <div className="flex items-center gap-2 px-6 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <div className="img w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div className="info">
+                      <p className="font-semibold">Qodebyte</p>
+                      <p className="text-xs text-gray-400">Admin User</p>
+                    </div>
+                  </div>
+                  {links.map((link) => (
+                    <Link
+                      href="#"
+                      className={`flex items-center gap-2 px-6 py-2 text-sm text-gray-700 group ${
+                        link.label === "Sign out"
+                          ? "text-red-500 hover:bg-red-100"
+                          : "hover:bg-gray-100"
+                      }`}
+                      onClick={(e) => e.preventDefault()}
+                      role="menuitem"
+                      tabIndex={-1}
+                      key={link.label}
+                    >
+                      <span
+                        className={` ${
+                          link.label === "Sign out"
+                            ? ""
+                            : "group-hover:text-blue-400"
+                        }`}
+                      >
+                        {link.icon}
+                      </span>
+                      <span>{link.label}</span>
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>

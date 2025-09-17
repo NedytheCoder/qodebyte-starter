@@ -29,4 +29,5 @@ export interface ChartProps {
 
 export interface ChartComponentProps extends Omit<ChartProps, 'type'> {
   className?: string;
+  colors?: string[];
 }

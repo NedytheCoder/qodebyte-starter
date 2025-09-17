@@ -6,7 +6,6 @@ import {
   FiHome,
   FiPieChart,
   FiUsers,
-  FiShoppingBag,
   FiSettings,
   FiSearch,
   FiBox,
@@ -23,12 +22,6 @@ import logo from "@/public/image.png";
 import Image from "next/image";
 
 const navItems = [
-  {
-    name: "Dashboard",
-    icon: <FiHome size={20} />,
-    path: "/dashboard",
-    exact: true,
-  },
   {
     name: "Inventory",
     icon: <FiBox size={20} />,
@@ -59,18 +52,6 @@ const navItems = [
     path: "/dashboard/staff",
     exact: false,
   },
-  {
-    name: "Reports",
-    icon: <BiSolidReport size={20} />,
-    path: "/dashboard/reports",
-    exact: false,
-  },
-  {
-    name: "Settings",
-    icon: <FiSettings size={20} />,
-    path: "/dashboard/settings",
-    exact: false,
-  },
 ];
 
 export default function Sidebar({ onClose }: SidebarProps) {
@@ -97,9 +78,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white fixed top-0 px-8">
+    <div className="h-screen flex flex-col bg-white fixed top-0 px-2 w-65">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200 flex justify-center items-center">
+      <div className="p-6 border-b border-gray-200 flex justify-center items-center w-full">
         <Image
           src={logo}
           alt="logo"
@@ -126,6 +107,29 @@ export default function Sidebar({ onClose }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-2">
         <ul className="space-y-1">
+          <li>
+            <Link
+              href="/dashboard"
+              onClick={handleItemClick}
+              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+                usePathname() === "/dashboard"
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              <span
+                className={`mr-3 ${
+                  usePathname() === "/dashboard"
+                    ? "text-indigo-500"
+                    : "text-gray-400"
+                }`}
+              >
+                <FiHome size={20} />
+              </span>
+              Dashboard
+            </Link>
+          </li>
+          <p className="text-sm font-medium text-gray-500 mt-3">Management</p>
           {navItems.map((item) => {
             const active = isActive(item.path, item.exact || false);
             return (
@@ -151,6 +155,51 @@ export default function Sidebar({ onClose }: SidebarProps) {
               </li>
             );
           })}
+          <p className="text-sm font-medium text-gray-500 mt-3">Others</p>
+          <li>
+            <Link
+              href="/dashboard/reports"
+              onClick={handleItemClick}
+              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+                usePathname() === "/dashboard/reports"
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              <span
+                className={`mr-3 ${
+                  usePathname() === "/dashboard/reports"
+                    ? "text-indigo-500"
+                    : "text-gray-400"
+                }`}
+              >
+                <BiSolidReport size={20} />
+              </span>
+              Reports
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/dashboard/settings"
+              onClick={handleItemClick}
+              className={`flex items-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+                usePathname() === "/dashboard/settings"
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              <span
+                className={`mr-3 ${
+                  usePathname() === "/dashboard/settings"
+                    ? "text-indigo-500"
+                    : "text-gray-400"
+                }`}
+              >
+                <FiSettings size={20} />
+              </span>
+              Settings
+            </Link>
+          </li>
         </ul>
       </nav>
 
