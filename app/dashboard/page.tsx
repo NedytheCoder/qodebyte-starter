@@ -404,7 +404,7 @@ const Page = () => {
                       Today&apos;s Revenue
                     </p>
                     <h3 className="text-sm md:text-md font-semibold mb-4">
-                      $200&lsquo;000&lsquo;000&lsquo;000
+                      $200&apos;000&apos;000&apos;000
                       <div className="flex items-center gap-1 border w-fit p-1 rounded-md text-green-400 text-xs md:text-sm">
                         <p className="text-xs md:text-sm">
                           <FaArrowUp />

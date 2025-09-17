@@ -13,7 +13,6 @@ import { PlusIcon } from "lucide-react";
 import React, { useState, useMemo } from "react";
 import { FaTable } from "react-icons/fa";
 import {
-  BarChart as AppBarChart,
   LineChart as AppLineChart,
   PieChart as AppPieChart,
 } from "@/app/components/charts";
