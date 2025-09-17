@@ -296,10 +296,15 @@ const Page = () => {
                     activeSection === t.key
                       ? "bg-indigo-600 text-white"
                       : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  } ${t.key === "stock" ? "relative" : ""}`}
                   onClick={() => setActiveSection(t.key)}
                 >
-                  {t.label}
+                  <p>{t.label}</p>
+                  {t.key === "stock" && (
+                    <span className="absolute top-0 -right-2 w-5 h-5 flex items-center justify-center bg-red-500 rounded-full text-white text-xs">
+                      4
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
