@@ -14,7 +14,7 @@ export function Pane<T extends string = string>({
   return (
     <div className="w-full border rounded-lg bg-white overflow-hidden">
       <div
-        className={`overflow-x-auto whitespace-nowrap scrollbar-hide md:flex md:space-x-2 ${
+        className={`overflow-x-auto whitespace-nowrap scrollbar-hide md:flex space-x-4 md:space-x-2 ${
           mainPane && "md:justify-between"
         }`}
       >

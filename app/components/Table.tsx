@@ -271,9 +271,20 @@ export function StockTable<T extends Record<string, unknown>>({
                 {columns.map((col) => (
                   <td
                     key={String(col.key)}
-                    className="whitespace-nowrap px-3 py-4"
+                    className={`whitespace-nowrap px-3 py-4 `}
                   >
-                    {String(row[col.key] ?? "")}
+                    <p
+                      className={`${
+                        row[col.key as keyof T] === "IN" && "text-green-500"
+                      } ${
+                        row[col.key as keyof T] === "OUT" && "text-red-500"
+                      } ${
+                        row[col.key as keyof T] === "DAMAGED" &&
+                        "text-yellow-500"
+                      }`}
+                    >
+                      {String(row[col.key as keyof T] ?? "")}
+                    </p>
                   </td>
                 ))}
 

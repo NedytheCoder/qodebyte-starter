@@ -21,7 +21,7 @@ import { Pane } from "../components/Tabpane";
 type TimeFilter = "today" | "yesterday" | "this_week" | "this_month" | "custom";
 type SectionTab = "overview" | "stock" | "sales" | "expenses" | "login";
 type StockTab = "all" | "purchased" | "sold" | "damaged" | "adjusted";
-type SaleFilter = "all" | "cash" | "credit" | "online" | "other";
+type SaleFilter = "all" | "walk" | "online";
 type LoginFilter = "all" | "success" | "failed";
 
 const TIME_FILTERS: { key: TimeFilter; label: string }[] = [
@@ -42,10 +42,8 @@ const SECTION_TABS: { key: SectionTab; label: string }[] = [
 
 const saleTabs: { key: SaleFilter; label: string }[] = [
   { key: "all", label: "All" },
-  { key: "cash", label: "Cash" },
-  { key: "credit", label: "Credit" },
+  { key: "walk", label: "Walk In" },
   { key: "online", label: "Online" },
-  { key: "other", label: "Other" },
 ];
 
 const loginTabs: { key: LoginFilter; label: string }[] = [
@@ -621,14 +619,17 @@ const Page = () => {
             </div>
 
             {/* Category Tabs */}
-            <Pane
-              tabs={stock}
-              setActiveSection={(section: StockTab): void => {
-                setActiveStock(section);
-              }}
-              activeSection={activeStock}
-            />
-
+            <div>
+              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
+                <Pane
+                  tabs={stock}
+                  setActiveSection={(section: StockTab): void => {
+                    setActiveStock(section);
+                  }}
+                  activeSection={activeStock}
+                />
+              </nav>
+            </div>
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
@@ -673,7 +674,7 @@ const Page = () => {
                   type: "Purchased",
                   quantity: 10,
                   addedBy: "John Doe",
-                  status: "In Stock",
+                  status: "IN",
                   lastupdated: "2 hours ago",
                 },
                 {
@@ -682,7 +683,16 @@ const Page = () => {
                   type: "Damaged",
                   quantity: 25,
                   addedBy: "John Doe",
-                  status: "Low Stock",
+                  status: "OUT",
+                  lastupdated: "1 day ago",
+                },
+                {
+                  date: "2023-06-02",
+                  item: "Water Bottle",
+                  type: "Sold",
+                  quantity: 25,
+                  addedBy: "John Doe",
+                  status: "DAMAGED",
                   lastupdated: "1 day ago",
                 },
               ]}
@@ -704,61 +714,50 @@ const Page = () => {
                 </p>
               </div>
             </div>
-
             {/* Category Tabs */}
-            <div className="w-full">
-              <Pane
-                tabs={saleTabs}
-                setActiveSection={(section: SaleFilter) =>
-                  setActiveSale(section)
-                }
-                activeSection={activeSale}
-              />
+            <div className="">
+              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
+                <Pane
+                  tabs={saleTabs}
+                  setActiveSection={(section: SaleFilter) =>
+                    setActiveSale(section)
+                  }
+                  activeSection={activeSale}
+                />
+              </nav>
               <StockTable
                 columns={[
                   { key: "invoiceNo", label: "Invoice No." },
-                  { key: "name", label: "Name" },
-                  { key: "category", label: "Category" },
-                  { key: "amount", label: "Amount" },
-                  { key: "staff", label: "Staff" },
-                  { key: "saleMethod", label: "Sale Method" },
-                  { key: "discount", label: "Discount" },
-                  { key: "vat", label: "VAT" },
-                  { key: "total", label: "Total" },
+                  { key: "salesDate", label: "Sales Date" },
+                  { key: "customer", label: "Customer" },
+                  { key: "totalAmount", label: "Total Amount" },
+                  { key: "salesMethod", label: "Sales Method" },
+                  { key: "salesPerson", label: "Sales Person" },
                 ]}
                 rows={[
                   {
                     invoiceNo: "INV-001",
-                    name: "Qodebyte",
-                    category: "Purchased",
-                    amount: 250,
-                    staff: "John Doe",
-                    saleMethod: "Cash",
-                    discount: 0,
-                    vat: 0,
-                    total: 250,
+                    salesDate: "2023-06-02",
+                    customer: "Qodebyte",
+                    totalAmount: 250,
+                    salesMethod: "Online",
+                    salesPerson: "John Doe",
                   },
                   {
                     invoiceNo: "INV-002",
-                    name: "Qodebyte",
-                    category: "Purchased",
-                    amount: 250,
-                    staff: "Jane Doe",
-                    saleMethod: "Credit Card",
-                    discount: 0,
-                    vat: 0,
-                    total: 250,
+                    salesDate: "2023-06-02",
+                    customer: "Qodebyte",
+                    totalAmount: 250,
+                    salesMethod: "Walk In",
+                    salesPerson: "Jane Doe",
                   },
                   {
                     invoiceNo: "INV-003",
-                    name: "Qodebyte",
-                    category: "Purchased",
-                    amount: 250,
-                    staff: "Jane Doe",
-                    saleMethod: "Online",
-                    discount: 0,
-                    vat: 0,
-                    total: 250,
+                    salesDate: "2023-06-02",
+                    customer: "Qodebyte",
+                    totalAmount: 250,
+                    salesMethod: "Online",
+                    salesPerson: "Jane Doe",
                   },
                 ]}
                 onView={(row) => console.log("View", row)}
@@ -822,35 +821,261 @@ const Page = () => {
             </div>
 
             {/* Stock Table */}
-            <StockTable
-              columns={[
-                { key: "date", label: "Date" },
-                { key: "device", label: "Device" },
-                { key: "ipAddress", label: "IP Address" },
-                { key: "timestamp", label: "Timestamp" },
-                { key: "location", label: "Location" },
-                { key: "status", label: "Status" },
-              ]}
-              rows={[
-                {
-                  date: "2023-06-01",
-                  device: "Laptop",
-                  ipAddress: "192.168.1.1",
-                  timestamp: "2023-06-01T09:30:00",
-                  location: "Enugu, Nigeria",
-                  status: "success",
-                  statusText: "Successful",
-                },
-              ]}
-              onView={(row) => console.log("View", row)}
-              onReport={(row) => console.log("Report", row)}
-            />
+            <div className="overflow-hidden shadow rounded-lg">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
+                  <thead className="bg-gray-50">
+                    <tr className="hidden sm:table-row">
+                      <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
+                        Date & Time
+                      </th>
+                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                        Device
+                      </th>
+                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                        IP Address
+                      </th>
+                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                        Location
+                      </th>
+                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                        Status
+                      </th>
+                      <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {[
+                      {
+                        id: 1,
+                        device: { type: "Laptop", os: "Windows 11" },
+                        ipAddress: "192.168.1.1",
+                        timestamp: "2023-11-15T09:30:00",
+                        location: "Enugu, Nigeria",
+                        status: "success",
+                        statusText: "Successful",
+                      },
+                      {
+                        id: 2,
+                        device: { type: "Mobile", os: "iOS 16" },
+                        ipAddress: "192.168.1.15",
+                        timestamp: "2023-11-15T12:45:22",
+                        location: "Lagos, Nigeria",
+                        status: "success",
+                        statusText: "Successful",
+                      },
+                      {
+                        id: 3,
+                        device: { type: "Tablet", os: "Android 13" },
+                        ipAddress: "192.168.1.27",
+                        timestamp: "2023-11-14T15:20:10",
+                        location: "Abuja, Nigeria",
+                        status: "failed",
+                        statusText: "Failed - Wrong Password",
+                      },
+                      {
+                        id: 4,
+                        device: { type: "Desktop", os: "Windows 10" },
+                        ipAddress: "192.168.1.34",
+                        timestamp: "2023-11-14T08:12:45",
+                        location: "Port Harcourt, Nigeria",
+                        status: "success",
+                        statusText: "Successful",
+                      },
+                      {
+                        id: 5,
+                        device: { type: "Mobile", os: "Android 12" },
+                        ipAddress: "192.168.1.42",
+                        timestamp: "2023-11-13T18:30:15",
+                        location: "Kano, Nigeria",
+                        status: "failed",
+                        statusText: "Failed - Invalid Credentials",
+                      },
+                    ]
+                      .sort(
+                        (a, b) =>
+                          new Date(b.timestamp).getTime() -
+                          new Date(a.timestamp).getTime()
+                      )
+                      .map((item) => {
+                        const date = new Date(item.timestamp);
+                        const formattedDate = date.toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        });
+                        const formattedTime = date.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        });
+
+                        return (
+                          <tr key={item.id} className="hover:bg-gray-50">
+                            {/* Date & Time */}
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
+                              <div className="sm:hidden mb-1 font-semibold">
+                                Date & Time
+                              </div>
+                              <div className="flex flex-col">
+                                <span>{formattedDate}</span>
+                                <span className="text-xs text-gray-500">
+                                  {formattedTime}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Device */}
+                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                              <div className="sm:hidden mb-1 font-semibold">
+                                Device
+                              </div>
+                              <div className="flex items-center">
+                                {/* <div className="h-8 w-8 flex-shrink-0 bg-gray-100 rounded-md flex items-center justify-center">
+                                  {item.device.type === "Mobile" ? (
+                                    <svg
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16z" />
+                                    </svg>
+                                  ) : item.device.type === "Tablet" ? (
+                                    <svg
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M21 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 1.99-.9 1.99-2L23 6c0-1.1-.9-2-2-2zm-2 14H5V6h14v12z" />
+                                    </svg>
+                                  ) : (
+                                    <svg
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
+                                    </svg>
+                                  )}
+                                </div> */}
+                                <div className="ml-3">
+                                  <div className="font-medium text-gray-900">
+                                    {item.device.type}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {item.device.os}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* IP Address */}
+                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                              <div className="sm:hidden mb-1 font-semibold">
+                                IP Address
+                              </div>
+                              <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
+                                {item.ipAddress}
+                              </span>
+                            </td>
+
+                            {/* Location */}
+                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                              <div className="sm:hidden mb-1 font-semibold">
+                                Location
+                              </div>
+                              <div className="flex items-center">
+                                {/* <svg
+                                  className="h-4 w-4 text-gray-400 mr-1"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg> */}
+                                {item.location}
+                              </div>
+                            </td>
+
+                            {/* Status */}
+                            <td className="whitespace-nowrap px-3 py-4 text-sm">
+                              <div className="sm:hidden mb-1 font-semibold">
+                                Status
+                              </div>
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  item.status === "success"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {item.status === "success" ? (
+                                  <svg
+                                    className="-ml-0.5 mr-1.5 h-2 w-2 text-green-500"
+                                    fill="currentColor"
+                                    viewBox="0 0 8 8"
+                                  >
+                                    <circle cx={4} cy={4} r={3} />
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    className="-ml-0.5 mr-1.5 h-2 w-2 text-red-500"
+                                    fill="currentColor"
+                                    viewBox="0 0 8 8"
+                                  >
+                                    <circle cx={4} cy={4} r={3} />
+                                  </svg>
+                                )}
+                                {item.statusText}
+                              </span>
+                            </td>
+
+                            {/* Actions */}
+                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
+                              <div className="sm:hidden mb-2 font-semibold">
+                                Actions
+                              </div>
+                              <button
+                                type="button"
+                                className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                onClick={() => {
+                                  // View details action
+                                  console.log("View details for:", item.id);
+                                }}
+                              >
+                                View
+                              </button>
+                              <button
+                                type="button"
+                                className="text-red-600 hover:text-red-900"
+                                onClick={() => {
+                                  // Report suspicious activity action
+                                  console.log(
+                                    "Report suspicious activity:",
+                                    item.id
+                                  );
+                                }}
+                              >
+                                Report
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
             {/* Pagination */}
             <Pagination
               currentPage={1}
-              totalPages={3}
-              onPageChange={() => {}}
+              totalPages={2}
+              onPageChange={(page) => console.log("Page:", page)}
             />
           </div>
         )}
@@ -890,42 +1115,147 @@ const Page = () => {
             </div>
 
             {/* Expenses Table */}
-            <StockTable
-              columns={[
-                { key: "category", label: "Category" },
-                { key: "description", label: "Description" },
-                { key: "date", label: "Date" },
-                { key: "amount", label: "Amount" },
-              ]}
-              rows={[
-                {
-                  category: "Maintenance",
-                  description: "Pump Maintenance",
-                  date: "2023-01-01",
-                  amount: 100,
-                },
-                {
-                  category: "Utilities",
-                  description: "Electricity",
-                  date: "2023-01-01",
-                  amount: 100,
-                },
-                {
-                  category: "Maintenance",
-                  description: "Pump Maintenance",
-                  date: "2023-01-01",
-                  amount: 100,
-                },
-              ]}
-              onEdit={(row) => console.log("Edit", row)}
-              onDelete={(row) => console.log("Delete", row)}
-            />
+            <div className="overflow-hidden shadow rounded-lg">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Category
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Description
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Date
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Amount
+                      </th>
+                      <th scope="col" className="relative px-6 py-3">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {[
+                      {
+                        id: 1,
+                        name: "Maintenance",
+                        description: "Pump Maintenance",
+                        date: "2023-01-01",
+                        formattedDate: "Jan 1, 2023",
+                        addedBy: "John Doe",
+                        amount: 150.75,
+                        lastUpdated: "2 hours ago",
+                      },
+                      {
+                        id: 2,
+                        name: "Utilities",
+                        description: "Electricity Bill",
+                        date: "2023-01-05",
+                        formattedDate: "Jan 5, 2023",
+                        addedBy: "Jane Smith",
+                        amount: 289.5,
+                        lastUpdated: "1 day ago",
+                      },
+                      {
+                        id: 3,
+                        name: "Office Supplies",
+                        description: "Printer paper and ink",
+                        date: "2023-01-10",
+                        formattedDate: "Jan 10, 2023",
+                        addedBy: "Mike Johnson",
+                        amount: 87.25,
+                        lastUpdated: "3 days ago",
+                      },
+                    ].map((expense) => (
+                      <tr key={expense.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            {/* <div
+                              className={`h-3 w-3 rounded-full mr-3 ${
+                                expense.name === "Maintenance"
+                                  ? "bg-yellow-400"
+                                  : expense.name === "Utilities"
+                                  ? "bg-blue-400"
+                                  : "bg-green-400"
+                              }`}
+                            ></div> */}
+                            <div className="text-sm font-medium text-gray-900 capitalize">
+                              {expense.name}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">
+                            {expense.description}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Added by {expense.addedBy}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {expense.formattedDate}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {expense.lastUpdated}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                          <span className="text-sm font-medium text-gray-900">
+                            ${expense.amount.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-3">
+                            <button className="text-indigo-600 hover:text-indigo-900">
+                              View
+                            </button>
+                            <button className="text-red-600 hover:text-red-900">
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50">
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-3 text-sm font-medium text-gray-900"
+                      >
+                        Total
+                      </td>
+                      <td className="px-6 py-3 text-right text-sm font-medium text-gray-900">
+                        $527.50
+                      </td>
+                      <td className="px-6 py-3"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
 
             {/* Pagination */}
             <Pagination
               currentPage={1}
-              totalPages={3}
-              onPageChange={() => {}}
+              totalPages={2}
+              onPageChange={(page) => console.log("Page:", page)}
             />
           </div>
         )}
