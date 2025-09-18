@@ -3,7 +3,7 @@
 import Toast from "@/app/components/Toast";
 import { useMemo, useState } from "react";
 import { DateRangeModal } from "../components/DateRangeModal";
-import { SelectDropdown } from "../components/Input";
+import { SectionTabInput, SelectDropdown } from "../components/Input";
 import {
   BarChart as AppBarChart,
   PieChart as AppPieChart,
@@ -14,9 +14,15 @@ import { FaArrowRight, FaArrowUp } from "react-icons/fa";
 import { AiOutlineStock } from "react-icons/ai";
 import { FiBox } from "react-icons/fi";
 import { MdGroups } from "react-icons/md";
+import { StockTable } from "../components/Table";
+import { Pagination } from "../components/Pagination";
+import { Pane } from "../components/Tabpane";
 
 type TimeFilter = "today" | "yesterday" | "this_week" | "this_month" | "custom";
 type SectionTab = "overview" | "stock" | "sales" | "expenses" | "login";
+type StockTab = "all" | "purchased" | "sold" | "damaged" | "adjusted";
+type SaleFilter = "all" | "cash" | "credit" | "online" | "other";
+type LoginFilter = "all" | "success" | "failed";
 
 const TIME_FILTERS: { key: TimeFilter; label: string }[] = [
   { key: "today", label: "Today" },
@@ -34,132 +40,40 @@ const SECTION_TABS: { key: SectionTab; label: string }[] = [
   { key: "login", label: "Login Attempts" },
 ];
 
-// Table data structures
-// const salesOverviewData = [
-//   {
-//     product: "12.5kg Gas Cylinder",
-//     unitsSold: 250,
-//     totalRevenue: "₦1,250,000",
-//   },
-//   { product: "6kg Gas Refill", unitsSold: 180, totalRevenue: "₦540,000" },
-//   { product: "Burner Hose", unitsSold: 120, totalRevenue: "₦180,000" },
-//   { product: "Total", unitsSold: 550, totalRevenue: "₦1,970,000" },
-// ];
+const saleTabs: { key: SaleFilter; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "cash", label: "Cash" },
+  { key: "credit", label: "Credit" },
+  { key: "online", label: "Online" },
+  { key: "other", label: "Other" },
+];
 
-// const inventoryStatusData = [
-//   {
-//     item: "6kg Gas Refill",
-//     orders: 180,
-//     repeat: 60,
-//     status: "✔",
-//     stock: 70,
-//     stockPercentage: 70,
-//   },
-//   {
-//     item: "12.5kg Gas Cylinder",
-//     orders: 150,
-//     repeat: 50,
-//     status: "✔",
-//     stock: 50,
-//     stockPercentage: 50,
-//   },
-//   {
-//     item: "Regulator",
-//     orders: 90,
-//     repeat: 30,
-//     status: "Low",
-//     stock: 20,
-//     stockPercentage: 20,
-//   },
-// ];
-
-// const staffPerformanceData = [
-//   {
-//     staff: "Chinedu",
-//     role: "Sales Rep",
-//     sales: "₦600,000",
-//     orders: 110,
-//     rating: "4.8 ⭐",
-//     hours: "120 hrs",
-//     roleColor: "green",
-//   },
-//   {
-//     staff: "Amaka",
-//     role: "Store Manager",
-//     sales: "₦450,000",
-//     orders: 85,
-//     rating: "4.6 ⭐",
-//     hours: "115 hrs",
-//     roleColor: "red",
-//   },
-//   {
-//     staff: "Seyi",
-//     role: "Delivery",
-//     sales: "₦300,000",
-//     orders: 75,
-//     rating: "4.9 ⭐",
-//     hours: "100 hrs",
-//     roleColor: "blue",
-//   },
-// ];
-
-// const stockData = [
-//   {
-//     item: "12.5kg Gas Cylinder",
-//     category: "Gas Cylinders",
-//     currentStock: 45,
-//     status: "In Stock",
-//     lastUpdated: "2 hours ago",
-//     statusColor: "green",
-//   },
-//   {
-//     item: "6kg Gas Refill",
-//     category: "Gas Refills",
-//     currentStock: 12,
-//     status: "Low Stock",
-//     lastUpdated: "1 hour ago",
-//     statusColor: "yellow",
-//   },
-//   {
-//     item: "Burner Hose",
-//     category: "Accessories",
-//     currentStock: 8,
-//     status: "Low Stock",
-//     lastUpdated: "30 minutes ago",
-//     statusColor: "yellow",
-//   },
-//   {
-//     item: "Regulator",
-//     category: "Accessories",
-//     currentStock: 3,
-//     status: "Out of Stock",
-//     lastUpdated: "15 minutes ago",
-//     statusColor: "red",
-//   },
-// ];
-
-// const items = [
-//   { name: "Income", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-//   { name: "Expenses", value: 20000000 },
-// ];
+const loginTabs: { key: LoginFilter; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "success", label: "Success" },
+  { key: "failed", label: "Failed" },
+];
 
 const Page = () => {
   const [activeTime, setActiveTime] = useState<TimeFilter>("today");
   const [activeSection, setActiveSection] = useState<SectionTab>("overview");
+  const [activeStock, setActiveStock] = useState<StockTab>("all");
   const [showDateModal, setShowDateModal] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [customDate, setCustomDate] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeSale, setActiveSale] = useState<SaleFilter>("all");
+  const [activeLogin, setActiveLogin] = useState<LoginFilter>("all");
+
+  const stock: { key: StockTab; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "purchased", label: "Purchased" },
+    { key: "sold", label: "Sold" },
+    { key: "damaged", label: "Damaged" },
+    { key: "adjusted", label: "Adjusted" },
+  ];
+
   const num = [
     {
       icon: <TbCurrencyNaira />,
@@ -225,6 +139,39 @@ const Page = () => {
     ],
     []
   );
+
+  const stockData = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "12.5kg Gas Cylinder",
+        category: "Gas",
+        stock: 45,
+        status: "Low Stock",
+        lastUpdated: "2 hours ago",
+      },
+      {
+        id: 2,
+        name: "12.5kg Gas Cylinder",
+        category: "Gas",
+        stock: 45,
+        status: "Low Stock",
+        lastUpdated: "2 hours ago",
+      },
+      // ... more stock items
+    ],
+    []
+  );
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = useMemo(
+    () => Math.ceil(stockData.length / 5),
+    [stockData]
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   return (
     <main className="flex-1 w-full md:ml-64">
       <div className="px-4 sm:px-6 lg:px-8 py-6">
@@ -233,31 +180,20 @@ const Page = () => {
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Dashboard</h1>
           </div>
-          <div
-            className={`w-full md:flex md:justify-end ${
-              activeSection === "overview" ? "mb-4" : "-mb-2"
-            }`}
-          >
-            <div className="w-full md:w-auto border rounded-lg bg-white p-1">
+          <div className={`w-full md:flex md:justify-end mb-4`}>
+            <div className="w-full md:w-auto border rounded-lg">
               <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <div className="flex gap-2">
-                  {TIME_FILTERS.map((t) => (
-                    <button
-                      key={t.key}
-                      className={`px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                        activeTime === t.key
-                          ? "bg-indigo-600 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                      onClick={() => {
-                        setActiveTime(t.key);
-                        if (t.key === "custom") setShowDateModal(true);
-                        else setShowDateModal(false);
-                      }}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+                  <Pane
+                    tabs={TIME_FILTERS}
+                    setActiveSection={(section: TimeFilter) =>
+                      setActiveTime(section)
+                    }
+                    activeSection={activeTime}
+                    setShowDateModal={(show: boolean): void => {
+                      setShowDateModal(show);
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -287,28 +223,14 @@ const Page = () => {
         </div>
         {/* Tabs: Section Switcher */}
         <div className="w-full mb-4">
-          <div className="w-full border rounded-lg bg-white p-1">
-            <div className="overflow-x-auto whitespace-nowrap scrollbar-hide md:flex md:justify-between">
-              {SECTION_TABS.map((t) => (
-                <button
-                  key={t.key}
-                  className={`mt-5 md:mt-0 px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                    activeSection === t.key
-                      ? "bg-indigo-600 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  } ${t.key === "stock" ? "relative" : ""}`}
-                  onClick={() => setActiveSection(t.key)}
-                >
-                  <p>{t.label}</p>
-                  {t.key === "stock" && (
-                    <span className="absolute top-0 -right-1 md:-right-2 w-4 h-4 md:w-5 md:h-5 flex items-center justify-center bg-red-500 rounded-full text-white text-[10px] sm:text-xs">
-                      4
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Pane
+            tabs={SECTION_TABS}
+            setActiveSection={(section: SectionTab) =>
+              setActiveSection(section)
+            }
+            activeSection={activeSection}
+            mainPane={true}
+          />
         </div>
 
         {/* Date Range Modal */}
@@ -448,7 +370,7 @@ const Page = () => {
                     <span className="text-green-500">
                       <AiOutlineStock size={20} />
                     </span>
-                    Sales Overview
+                    Top Selling Products
                   </h3>
                   <span className="text-xs text-green-500 bg-green-50 px-3 py-1 rounded-full">
                     This Month
@@ -501,7 +423,7 @@ const Page = () => {
                     <span className="text-green-500">
                       <FiBox size={20} />
                     </span>
-                    Inventory Status
+                    Most Ordered Items
                   </h3>
                   <p className="text-xs text-green-500 bg-green-50 px-3 py-1 rounded-full">
                     Live Updates
@@ -699,33 +621,19 @@ const Page = () => {
             </div>
 
             {/* Category Tabs */}
-            <div className="">
-              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
-                {["All", "Gas", "Accessories"].map((t) => (
-                  <button
-                    key={t}
-                    className={`px-4 py-2 text-xs md:text-sm rounded-md whitespace-nowrap transition-colors ${
-                      activeCategory === t
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                    onClick={() => setActiveCategory(t)}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </nav>
-            </div>
+            <Pane
+              tabs={stock}
+              setActiveSection={(section: StockTab): void => {
+                setActiveStock(section);
+              }}
+              activeSection={activeStock}
+            />
 
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
                 <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search by Inventory Name / Category"
-                    className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                  />
+                  <SectionTabInput placeholder="Search by Inventory Name / Category" />
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                   <SelectDropdown
@@ -747,287 +655,40 @@ const Page = () => {
             </div>
 
             {/* Stock Table */}
-            <div className="overflow-hidden shadow rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
-                  <thead className="bg-gray-50 hidden sm:table-header-group">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6"
-                      >
-                        Item
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-left font-semibold text-gray-900"
-                      >
-                        Category
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-left font-semibold text-gray-900"
-                      >
-                        Current Stock
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-left font-semibold text-gray-900"
-                      >
-                        Status
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-3 py-3.5 text-left font-semibold text-gray-900"
-                      >
-                        Last Updated
-                      </th>
-                      <th
-                        scope="col"
-                        className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                      >
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {[
-                      {
-                        id: 1,
-                        name: "12.5kg Gas Cylinder",
-                        category: "Gas",
-                        stock: 45,
-                        status: "In Stock",
-                        lastUpdated: "2 hours ago",
-                      },
-                      {
-                        id: 2,
-                        name: "6kg Gas Refill",
-                        category: "Gas",
-                        stock: 12,
-                        status: "Low Stock",
-                        lastUpdated: "1 day ago",
-                      },
-                      {
-                        id: 3,
-                        name: "Gas Regulator",
-                        category: "Accessories",
-                        stock: 8,
-                        status: "Low Stock",
-                        lastUpdated: "3 days ago",
-                      },
-                      {
-                        id: 4,
-                        name: "Hose Pipe",
-                        category: "Accessories",
-                        stock: 32,
-                        status: "In Stock",
-                        lastUpdated: "1 week ago",
-                      },
-                      {
-                        id: 5,
-                        name: "Gas Burner",
-                        category: "Accessories",
-                        stock: 0,
-                        status: "Out of Stock",
-                        lastUpdated: "2 weeks ago",
-                      },
-                    ].map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="whitespace-nowrap py-4 pl-4 pr-3  font-medium text-gray-900 sm:pl-6">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Item
-                          </div>
-                          <span className="text-gray-500">{item.name}</span>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Category
-                          </div>
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              item.category === "Gas"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {item.category}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Current Stock
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                              className={`h-2.5 rounded-full ${
-                                item.stock === 0
-                                  ? "bg-red-500"
-                                  : item.stock < 15
-                                  ? "bg-yellow-500"
-                                  : "bg-green-500"
-                              }`}
-                              style={{
-                                width: `${Math.min(
-                                  100,
-                                  (item.stock / 50) * 100
-                                )}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-xs text-gray-500 mt-1 block">
-                            {item.stock} units
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Status
-                          </div>
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              item.status === "In Stock"
-                                ? "bg-green-100 text-green-800"
-                                : item.status === "Low Stock"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {item.status}
-                          </span>
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Last Updated
-                          </div>
-                          {item.lastUpdated}
-                        </td>
-                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                          <div className="sm:hidden mb-2 font-semibold">
-                            Actions
-                          </div>
-                          <button className="text-indigo-600 hover:text-indigo-900 mr-4">
-                            Edit
-                          </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-              <div className="flex flex-1 justify-between sm:hidden">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Next
-                </a>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to{" "}
-                    <span className="font-medium">5</span> of{" "}
-                    <span className="font-medium">24</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav
-                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                    aria-label="Pagination"
-                  >
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01.02-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      1
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      2
-                    </a>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      3
-                    </a>
-                    <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                      ...
-                    </span>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      8
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      9
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      10
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Next</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </nav>
-                </div>
-              </div>
-            </div>
+            <StockTable
+              columns={[
+                { key: "date", label: "Date" },
+                { key: "item", label: "Item" },
+                { key: "type", label: "Type" },
+                { key: "quantity", label: "Quantity" },
+                { key: "addedBy", label: "Added By" },
+                { key: "status", label: "Status" },
+                { key: "lastupdated", label: "Last Updated" },
+              ]}
+              rows={[
+                {
+                  date: "2023-06-02",
+                  item: "Gas Cylinder",
+                  type: "Purchased",
+                  quantity: 10,
+                  addedBy: "John Doe",
+                  status: "In Stock",
+                  lastupdated: "2 hours ago",
+                },
+                {
+                  date: "2023-06-02",
+                  item: "Water Bottle",
+                  type: "Damaged",
+                  quantity: 25,
+                  addedBy: "John Doe",
+                  status: "Low Stock",
+                  lastupdated: "1 day ago",
+                },
+              ]}
+              onEdit={(row) => console.log("Edit", row)}
+              onDelete={(row) => console.log("Delete", row)}
+            />
           </div>
         )}
 
@@ -1046,29 +707,64 @@ const Page = () => {
 
             {/* Category Tabs */}
             <div className="w-full">
-              <div className="w-full border rounded-lg bg-white p-1">
-                <div className="overflow-x-auto whitespace-nowrap scrollbar-hide md:flex md:justify-between">
-                  {[
-                    { key: "all", label: "All" },
-                    { key: "completed", label: "Completed" },
-                    { key: "in-transit", label: "In-Transit" },
-                    { key: "pending", label: "Pending" },
-                    { key: "canceled", label: "Canceled" },
-                  ].map((tab) => (
-                    <button
-                      key={tab.key}
-                      className={`px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                        activeCategory === tab.key
-                          ? "bg-indigo-600 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                      onClick={() => setActiveCategory(tab.key)}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <Pane
+                tabs={saleTabs}
+                setActiveSection={(section: SaleFilter) =>
+                  setActiveSale(section)
+                }
+                activeSection={activeSale}
+              />
+              <StockTable
+                columns={[
+                  { key: "invoiceNo", label: "Invoice No." },
+                  { key: "name", label: "Name" },
+                  { key: "category", label: "Category" },
+                  { key: "amount", label: "Amount" },
+                  { key: "staff", label: "Staff" },
+                  { key: "saleMethod", label: "Sale Method" },
+                  { key: "discount", label: "Discount" },
+                  { key: "vat", label: "VAT" },
+                  { key: "total", label: "Total" },
+                ]}
+                rows={[
+                  {
+                    invoiceNo: "INV-001",
+                    name: "Qodebyte",
+                    category: "Purchased",
+                    amount: 250,
+                    staff: "John Doe",
+                    saleMethod: "Cash",
+                    discount: 0,
+                    vat: 0,
+                    total: 250,
+                  },
+                  {
+                    invoiceNo: "INV-002",
+                    name: "Qodebyte",
+                    category: "Purchased",
+                    amount: 250,
+                    staff: "Jane Doe",
+                    saleMethod: "Credit Card",
+                    discount: 0,
+                    vat: 0,
+                    total: 250,
+                  },
+                  {
+                    invoiceNo: "INV-003",
+                    name: "Qodebyte",
+                    category: "Purchased",
+                    amount: 250,
+                    staff: "Jane Doe",
+                    saleMethod: "Online",
+                    discount: 0,
+                    vat: 0,
+                    total: 250,
+                  },
+                ]}
+                onView={(row) => console.log("View", row)}
+                onDelete={(row) => console.log("Delete", row)}
+                className="mt-3"
+              />
             </div>
           </div>
         )}
@@ -1090,19 +786,13 @@ const Page = () => {
             {/* Category Tabs */}
             <div className="">
               <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
-                {["All", "Success", "Failed"].map((t) => (
-                  <button
-                    key={t}
-                    className={`px-4 py-2 text-xs md:text-sm rounded-md whitespace-nowrap transition-colors ${
-                      activeCategory === t
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                    onClick={() => setActiveCategory(t)}
-                  >
-                    {t}
-                  </button>
-                ))}
+                <Pane
+                  tabs={loginTabs}
+                  setActiveSection={(section: LoginFilter) =>
+                    setActiveLogin(section)
+                  }
+                  activeSection={activeLogin}
+                />
               </nav>
             </div>
 
@@ -1110,11 +800,7 @@ const Page = () => {
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
                 <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search by Order Name / ID"
-                    className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                  />
+                  <SectionTabInput placeholder="Search by Order Name / ID" />
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                   <SelectDropdown
@@ -1136,365 +822,36 @@ const Page = () => {
             </div>
 
             {/* Stock Table */}
-            <div className="overflow-hidden shadow rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
-                  <thead className="bg-gray-50">
-                    <tr className="hidden sm:table-row">
-                      <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
-                        Date & Time
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Device
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        IP Address
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Location
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Status
-                      </th>
-                      <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {[
-                      {
-                        id: 1,
-                        device: { type: "Laptop", os: "Windows 11" },
-                        ipAddress: "192.168.1.1",
-                        timestamp: "2023-11-15T09:30:00",
-                        location: "Enugu, Nigeria",
-                        status: "success",
-                        statusText: "Successful",
-                      },
-                      {
-                        id: 2,
-                        device: { type: "Mobile", os: "iOS 16" },
-                        ipAddress: "192.168.1.15",
-                        timestamp: "2023-11-15T12:45:22",
-                        location: "Lagos, Nigeria",
-                        status: "success",
-                        statusText: "Successful",
-                      },
-                      {
-                        id: 3,
-                        device: { type: "Tablet", os: "Android 13" },
-                        ipAddress: "192.168.1.27",
-                        timestamp: "2023-11-14T15:20:10",
-                        location: "Abuja, Nigeria",
-                        status: "failed",
-                        statusText: "Failed - Wrong Password",
-                      },
-                      {
-                        id: 4,
-                        device: { type: "Desktop", os: "Windows 10" },
-                        ipAddress: "192.168.1.34",
-                        timestamp: "2023-11-14T08:12:45",
-                        location: "Port Harcourt, Nigeria",
-                        status: "success",
-                        statusText: "Successful",
-                      },
-                      {
-                        id: 5,
-                        device: { type: "Mobile", os: "Android 12" },
-                        ipAddress: "192.168.1.42",
-                        timestamp: "2023-11-13T18:30:15",
-                        location: "Kano, Nigeria",
-                        status: "failed",
-                        statusText: "Failed - Invalid Credentials",
-                      },
-                    ]
-                      .sort(
-                        (a, b) =>
-                          new Date(b.timestamp).getTime() -
-                          new Date(a.timestamp).getTime()
-                      )
-                      .map((item) => {
-                        const date = new Date(item.timestamp);
-                        const formattedDate = date.toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        });
-                        const formattedTime = date.toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        });
-
-                        return (
-                          <tr key={item.id} className="hover:bg-gray-50">
-                            {/* Date & Time */}
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Date & Time
-                              </div>
-                              <div className="flex flex-col">
-                                <span>{formattedDate}</span>
-                                <span className="text-xs text-gray-500">
-                                  {formattedTime}
-                                </span>
-                              </div>
-                            </td>
-
-                            {/* Device */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Device
-                              </div>
-                              <div className="flex items-center">
-                                <div className="h-8 w-8 flex-shrink-0 bg-gray-100 rounded-md flex items-center justify-center">
-                                  {item.device.type === "Mobile" ? (
-                                    <svg
-                                      className="h-4 w-4 text-gray-500"
-                                      fill="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16z" />
-                                    </svg>
-                                  ) : item.device.type === "Tablet" ? (
-                                    <svg
-                                      className="h-4 w-4 text-gray-500"
-                                      fill="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M21 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 1.99-.9 1.99-2L23 6c0-1.1-.9-2-2-2zm-2 14H5V6h14v12z" />
-                                    </svg>
-                                  ) : (
-                                    <svg
-                                      className="h-4 w-4 text-gray-500"
-                                      fill="currentColor"
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
-                                    </svg>
-                                  )}
-                                </div>
-                                <div className="ml-3">
-                                  <div className="font-medium text-gray-900">
-                                    {item.device.type}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {item.device.os}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* IP Address */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                IP Address
-                              </div>
-                              <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
-                                {item.ipAddress}
-                              </span>
-                            </td>
-
-                            {/* Location */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Location
-                              </div>
-                              <div className="flex items-center">
-                                <svg
-                                  className="h-4 w-4 text-gray-400 mr-1"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                {item.location}
-                              </div>
-                            </td>
-
-                            {/* Status */}
-                            <td className="whitespace-nowrap px-3 py-4 text-sm">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Status
-                              </div>
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  item.status === "success"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {item.status === "success" ? (
-                                  <svg
-                                    className="-ml-0.5 mr-1.5 h-2 w-2 text-green-500"
-                                    fill="currentColor"
-                                    viewBox="0 0 8 8"
-                                  >
-                                    <circle cx={4} cy={4} r={3} />
-                                  </svg>
-                                ) : (
-                                  <svg
-                                    className="-ml-0.5 mr-1.5 h-2 w-2 text-red-500"
-                                    fill="currentColor"
-                                    viewBox="0 0 8 8"
-                                  >
-                                    <circle cx={4} cy={4} r={3} />
-                                  </svg>
-                                )}
-                                {item.statusText}
-                              </span>
-                            </td>
-
-                            {/* Actions */}
-                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                              <div className="sm:hidden mb-2 font-semibold">
-                                Actions
-                              </div>
-                              <button
-                                type="button"
-                                className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                onClick={() => {
-                                  // View details action
-                                  console.log("View details for:", item.id);
-                                }}
-                              >
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                className="text-red-600 hover:text-red-900"
-                                onClick={() => {
-                                  // Report suspicious activity action
-                                  console.log(
-                                    "Report suspicious activity:",
-                                    item.id
-                                  );
-                                }}
-                              >
-                                Report
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <StockTable
+              columns={[
+                { key: "date", label: "Date" },
+                { key: "device", label: "Device" },
+                { key: "ipAddress", label: "IP Address" },
+                { key: "timestamp", label: "Timestamp" },
+                { key: "location", label: "Location" },
+                { key: "status", label: "Status" },
+              ]}
+              rows={[
+                {
+                  date: "2023-06-01",
+                  device: "Laptop",
+                  ipAddress: "192.168.1.1",
+                  timestamp: "2023-06-01T09:30:00",
+                  location: "Enugu, Nigeria",
+                  status: "success",
+                  statusText: "Successful",
+                },
+              ]}
+              onView={(row) => console.log("View", row)}
+              onReport={(row) => console.log("Report", row)}
+            />
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-              <div className="flex flex-1 justify-between sm:hidden">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Next
-                </a>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to{" "}
-                    <span className="font-medium">5</span> of{" "}
-                    <span className="font-medium">24</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav
-                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                    aria-label="Pagination"
-                  >
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01.02-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      1
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      2
-                    </a>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      3
-                    </a>
-                    <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                      ...
-                    </span>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      8
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      9
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      10
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Next</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </nav>
-                </div>
-              </div>
-            </div>
+            <Pagination
+              currentPage={1}
+              totalPages={3}
+              onPageChange={() => {}}
+            />
           </div>
         )}
 
@@ -1514,11 +871,7 @@ const Page = () => {
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               <div className="relative flex-1">
-                <input
-                  type="text"
-                  placeholder="Search by Order Name / ID"
-                  className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                />
+                <SectionTabInput placeholder="Search by Order Name / ID" />
               </div>
               <div className="gap-3 hidden md:flex">
                 <SelectDropdown
@@ -1537,275 +890,43 @@ const Page = () => {
             </div>
 
             {/* Expenses Table */}
-            <div className="overflow-hidden shadow rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Category
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Description
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Date
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Amount
-                      </th>
-                      <th scope="col" className="relative px-6 py-3">
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {[
-                      {
-                        id: 1,
-                        name: "Maintenance",
-                        description: "Pump Maintenance",
-                        date: "2023-01-01",
-                        formattedDate: "Jan 1, 2023",
-                        addedBy: "John Doe",
-                        amount: 150.75,
-                        lastUpdated: "2 hours ago",
-                      },
-                      {
-                        id: 2,
-                        name: "Utilities",
-                        description: "Electricity Bill",
-                        date: "2023-01-05",
-                        formattedDate: "Jan 5, 2023",
-                        addedBy: "Jane Smith",
-                        amount: 289.5,
-                        lastUpdated: "1 day ago",
-                      },
-                      {
-                        id: 3,
-                        name: "Office Supplies",
-                        description: "Printer paper and ink",
-                        date: "2023-01-10",
-                        formattedDate: "Jan 10, 2023",
-                        addedBy: "Mike Johnson",
-                        amount: 87.25,
-                        lastUpdated: "3 days ago",
-                      },
-                    ].map((expense) => (
-                      <tr key={expense.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div
-                              className={`h-3 w-3 rounded-full mr-3 ${
-                                expense.name === "Maintenance"
-                                  ? "bg-yellow-400"
-                                  : expense.name === "Utilities"
-                                  ? "bg-blue-400"
-                                  : "bg-green-400"
-                              }`}
-                            ></div>
-                            <div className="text-sm font-medium text-gray-900 capitalize">
-                              {expense.name}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900">
-                            {expense.description}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            Added by {expense.addedBy}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {expense.formattedDate}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {expense.lastUpdated}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <span className="text-sm font-medium text-gray-900">
-                            ${expense.amount.toFixed(2)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end space-x-3">
-                            <button className="text-indigo-600 hover:text-indigo-900">
-                              <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                                />
-                              </svg>
-                            </button>
-                            <button className="text-red-600 hover:text-red-900">
-                              <svg
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-gray-50">
-                    <tr>
-                      <td
-                        colSpan={3}
-                        className="px-6 py-3 text-sm font-medium text-gray-900"
-                      >
-                        Total
-                      </td>
-                      <td className="px-6 py-3 text-right text-sm font-medium text-gray-900">
-                        $527.50
-                      </td>
-                      <td className="px-6 py-3"></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+            <StockTable
+              columns={[
+                { key: "category", label: "Category" },
+                { key: "description", label: "Description" },
+                { key: "date", label: "Date" },
+                { key: "amount", label: "Amount" },
+              ]}
+              rows={[
+                {
+                  category: "Maintenance",
+                  description: "Pump Maintenance",
+                  date: "2023-01-01",
+                  amount: 100,
+                },
+                {
+                  category: "Utilities",
+                  description: "Electricity",
+                  date: "2023-01-01",
+                  amount: 100,
+                },
+                {
+                  category: "Maintenance",
+                  description: "Pump Maintenance",
+                  date: "2023-01-01",
+                  amount: 100,
+                },
+              ]}
+              onEdit={(row) => console.log("Edit", row)}
+              onDelete={(row) => console.log("Delete", row)}
+            />
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-              <div className="flex flex-1 justify-between sm:hidden">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Next
-                </a>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to{" "}
-                    <span className="font-medium">5</span> of{" "}
-                    <span className="font-medium">24</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav
-                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                    aria-label="Pagination"
-                  >
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01.02-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      1
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      2
-                    </a>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      3
-                    </a>
-                    <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                      ...
-                    </span>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      8
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      9
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      10
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Next</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </nav>
-                </div>
-              </div>
-            </div>
+            <Pagination
+              currentPage={1}
+              totalPages={3}
+              onPageChange={() => {}}
+            />
           </div>
         )}
       </div>

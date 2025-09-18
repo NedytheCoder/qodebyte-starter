@@ -100,7 +100,9 @@ export function Textarea({
     <div className={inputClasses}>
       <textarea
         autoComplete="off"
-        className={error ? styles.error : ""}
+        className={`${
+          error ? styles.error : ""
+        } ${className} border-1 border-gray-300 rounded-md h-36 resize-none`}
         {...textareaProps}
       />
       <label htmlFor={textareaProps.name} className={error ? styles.error : ""}>
@@ -165,6 +167,11 @@ export function SelectDropdown({
               {option.label}
             </option>
           ))}
+          {options.length === 1 && (
+            <option value="" disabled className="text-gray-400">
+              No options available
+            </option>
+          )}
         </select>
       </div>
     </div>
@@ -316,7 +323,24 @@ export function Switch({
         {...props}
         disabled={disabled}
       />
-      <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-12 h-6 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-4 after:w-4 after:top-1 after:left-1 peer-checked:after:translate-x-8 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
+      <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-12 h-6 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-4 after:w-4 after:top-1 after:left-1 peer-checked:after:translate-x-6 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
     </label>
+  );
+}
+
+export function SectionTabInput({
+  className = "",
+  placeholder,
+  ...props
+}: InputProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        type="text"
+        placeholder={placeholder}
+        className={`w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm ${className}`}
+        {...props}
+      />
+    </div>
   );
 }

@@ -6,9 +6,11 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   maxVisiblePages?: number;
   className?: string;
+  label?: React.ReactNode;
 }
 
 export function Pagination({
+  label,
   currentPage,
   totalPages,
   onPageChange,
@@ -48,8 +50,14 @@ export function Pagination({
       className={`flex flex-col sm:flex-row items-center justify-between gap-4 ${className}`}
     >
       <div className="text-sm text-gray-700 dark:text-gray-300">
-        Page <span className="font-medium">{currentPage}</span> of{" "}
-        <span className="font-medium">{totalPages}</span>
+        {label ? (
+          label
+        ) : (
+          <>
+            Page <span className="font-medium">{currentPage}</span> of{" "}
+            <span className="font-medium">{totalPages}</span>
+          </>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-1">

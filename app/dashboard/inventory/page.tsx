@@ -1,17 +1,16 @@
 "use client";
 
-import { RegularButton, SecondaryButton } from "@/app/components/Button";
+import { RegularButton } from "@/app/components/Button";
 import {
-  Input,
-  Searchbar,
+  SectionTabInput,
   SelectDropdown,
   Switch,
+  Textarea,
 } from "@/app/components/Input";
 import { Pagination } from "@/app/components/Pagination";
-import { Table } from "@/app/components/Table";
 import { PlusIcon } from "lucide-react";
 import React, { useState, useMemo } from "react";
-import { FaArrowUp, FaTable } from "react-icons/fa";
+import { FaTable } from "react-icons/fa";
 import {
   LineChart as AppLineChart,
   PieChart as AppPieChart,
@@ -19,8 +18,10 @@ import {
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { BsCart2 } from "react-icons/bs";
-import { TbCurrencyNaira } from "react-icons/tb";
 import { FaArrowDown } from "react-icons/fa6";
+import { Select } from "radix-ui";
+import { FaAngleDown } from "react-icons/fa";
+import { AiOutlineClose } from "react-icons/ai";
 
 const Page = () => {
   type TimeFilter =
@@ -137,35 +138,27 @@ const Page = () => {
 
   const [bulkProduct, setBulkProduct] = useState(false);
 
-  const [variantManagement, setVariantManagement] = useState(false);
+  const [variantManagement, setVariantManagement] = useState(true);
+
+  const [additionalImage, setAdditionalImage] = useState([1, 2]);
+
+  const handleAddImage = () => {
+    if (additionalImage.length >= 5) {
+      toast.error("You can only add 5 images");
+      return;
+    } else {
+      setAdditionalImage([...additionalImage, additionalImage.length + 1]);
+    }
+  };
   return (
     <main className="flex-1 w-full md:ml-64">
-      <div className="px-4 sm:px-6 lg:px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-3">
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between my-2 gap-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mt-3">
           <div>
             <h1 className="text-lg font-semibold text-gray-900">Inventory</h1>
           </div>
           <div className="w-full md:flex md:justify-end mb-1">
-            <div className="w-full md:w-auto border rounded-lg bg-white p-1">
-              <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <div className="flex gap-2">
-                  {TIME_FILTERS.map((t) => (
-                    <button
-                      key={t.key}
-                      className={`px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                        activeTime === t.key
-                          ? "bg-indigo-600 text-white"
-                          : "text-gray-600 hover:bg-gray-100"
-                      }`}
-                      onClick={() => setActiveTime(t.key)}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
             <div className="mt-3 md:mt-0">
               {activeSection === "products" && addProduct && (
                 <RegularButton
@@ -269,12 +262,29 @@ const Page = () => {
 
       {/* Content by section */}
       {activeSection === "overview" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
           {/* Big Bar Chart */}
           <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden">
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">
-              Stock Movement
-            </h3>
+            <div className="flex justify-between">
+              <div className="mb-3 flex flex-col">
+                <h3 className="text-sm font-semibold text-gray-900">
+                  Stock Movement
+                </h3>
+                <p className="text-xs text-gray-600">
+                  Monitor your stocks in real time
+                </p>
+              </div>
+              <div>
+                <SelectDropdown
+                  placeholder="Available Products Graph"
+                  options={[
+                    { value: "all", label: "Available Products Graph" },
+                  ]}
+                  onChange={(value) => console.log("Category:", value)}
+                />
+              </div>
+            </div>
+
             <div className="h-72">
               <AppLineChart
                 data={barData}
@@ -296,12 +306,13 @@ const Page = () => {
               <div className="text-gray-800">
                 {/* <h3 className="text-sm font-semibold">Sales By Category</h3> */}
                 <p className="text-sm font-semibold text-gray-800">
-                  Sales By Category
+                  Inventory Distribution
                 </p>
                 <p className="text-xs text-gray-600">
-                  Breakdown Of Sales by Product Category
+                  Manage how stock is allocated and transferred
                 </p>
               </div>
+
               <div className="flex flex-col md:flex-row gap-10 items-center justify-center">
                 <div className="h-64 w-full md:w-1/2 md:mt-8">
                   <AppPieChart
@@ -317,34 +328,21 @@ const Page = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2 text-gray-800 w-full md:w-1/2">
-                  <p className="text-xs md:text-sm text-gray-600">
-                    Today&apos;s Revenue
-                  </p>
-                  <h3 className="text-sm md:text-md font-semibold mb-4">
-                    $200&apos;000&apos;000&apos;000
-                    <div className="flex items-center gap-1 border w-fit p-1 rounded-md text-green-400 text-xs md:text-sm">
-                      <p className="text-xs md:text-sm">
-                        <FaArrowUp />
-                      </p>
-                      <p className="text-xs md:text-sm">12%</p>
-                    </div>
-                  </h3>
-
                   <div className="text-gray-900 flex flex-row items-center gap-4">
                     <div>
                       {" "}
-                      <p className="flex items-center gap-1 text-xs md:text-sm">
+                      <p className="flex items-center gap-1 text-xs">
                         <span className="w-3 h-3 rounded-lg bg-green-500"></span>
-                        Income
+                        Available
                       </p>
-                      <p className="flex items-center gap-1 text-xs md:text-sm">
+                      <p className="flex items-center gap-1 text-xs">
                         <span className="w-3 h-3 rounded-lg bg-red-500"></span>
-                        Expenses
+                        Reserved
                       </p>
                     </div>
-                    <div className="text-gray-800 w-full md:w-1/3 flex flex-col gap-1 text-xs md:text-sm">
-                      <p>$200,000,000</p>
-                      <p>$200,000,000</p>
+                    <div className="text-gray-800 w-full md:w-1/3 flex flex-col gap-1 text-xs">
+                      <p>31%</p>
+                      <p>69%</p>
                     </div>
                   </div>
                 </div>
@@ -356,7 +354,7 @@ const Page = () => {
               <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-95 text-gray-800">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-semibold">Sales Overview</h3>
+                    <h3 className="text-sm font-semibold">Low Stock Items</h3>
                     <p className="text-xs text-gray-600">
                       Products that have reached threshold
                     </p>
@@ -364,11 +362,9 @@ const Page = () => {
                   <div className="gap-3 hidden md:flex">
                     <SelectDropdown
                       options={[
-                        { value: "all", label: "All Categories" },
-                        { value: "utilities", label: "Utilities" },
-                        { value: "maintenance", label: "Maintenance" },
-                        { value: "supplies", label: "Supplies" },
-                        { value: "other", label: "Other" },
+                        { value: "all", label: "Checkout List" },
+                        { value: "utilities", label: "Low Stock" },
+                        { value: "utilities", label: "Out Stock" },
                       ]}
                       placeholder="Check out date"
                       className="w-48"
@@ -395,7 +391,7 @@ const Page = () => {
       )}
 
       {activeSection === "products" && !addProduct && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
           {/* Big Bar Chart */}
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -432,11 +428,7 @@ const Page = () => {
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
                 <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search by Order Name / ID"
-                    className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                  />
+                  <SectionTabInput placeholder="Search by Order Name / ID" />
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                   <SelectDropdown
@@ -625,246 +617,327 @@ const Page = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-              <div className="flex flex-1 justify-between sm:hidden">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Previous
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Next
-                </a>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">1</span> to{" "}
-                    <span className="font-medium">5</span> of{" "}
-                    <span className="font-medium">24</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav
-                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                    aria-label="Pagination"
-                  >
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Previous</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01.02-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                    <a
-                      href="#"
-                      aria-current="page"
-                      className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    >
-                      1
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      2
-                    </a>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      3
-                    </a>
-                    <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                      ...
-                    </span>
-                    <a
-                      href="#"
-                      className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                    >
-                      8
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      9
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      10
-                    </a>
-                    <a
-                      href="#"
-                      className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                      <span className="sr-only">Next</span>
-                      <svg
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </a>
-                  </nav>
-                </div>
-              </div>
-            </div>
+            <Pagination
+              currentPage={1}
+              totalPages={2}
+              onPageChange={(page) => console.log("Page changed to:", page)}
+              label={
+                <>
+                  <p>Time Stock: 0</p>
+                </>
+              }
+            />
           </div>
         </div>
       )}
 
       {activeSection === "products" && addProduct && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 mb-6">
-          <div className="flex flex-col md:flex-row w-full gap-5">
-            <div className="flex flex-col gap-3 w-full md:w-2/3">
-              <p className="text-gray-800 mt-4 text-sm md:text-base">
-                New Inventory Item
-              </p>
-              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 mt-1">
-                <div className="relative mb-6">
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
+          <div className="flex flex-col md:flex-row items-center justify-between w-full">
+            <p className="text-gray-800 text-sm">New Inventory Item</p>
+            <div className="flex gap-2">
+              <RegularButton
+                label={
+                  <p className="text-xs flex items-center gap-2 w-20 text-center">
+                    <PlusIcon className="w-4 h-4" /> <span>Bulk Add</span>
+                  </p>
+                }
+                className="!bg-transparent !text-gray-600 !border !border-gray-600 w-1/2 !py-2 !px-2"
+                onClick={() => setBulkProduct(true)}
+              />
+              <RegularButton
+                label={<p className="text-xs">Save & Publish</p>}
+                className="w-2/3"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-[2fr_1fr] gap-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 flex flex-col gap-6">
+              <div className="relative ">
+                <input
+                  type="text"
+                  id="productName"
+                  className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="productName"
+                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
+                >
+                  Product Name
+                </label>
+              </div>
+
+              <div className="relative ">
+                <input
+                  type="text"
+                  id="brand"
+                  className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                  placeholder=" "
+                />
+                <label
+                  htmlFor="brand"
+                  className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
+                >
+                  Brand
+                </label>
+              </div>
+
+              <div className="flex gap-3 w-full ">
+                <div className="relative flex-1">
+                  <select
+                    id="category"
+                    className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                  >
+                    <option value=""> </option>
+                    <option value="Category 1">Category 1</option>
+                    <option value="Category 2">Category 2</option>
+                    <option value="Category 3">Category 3</option>
+                  </select>
+                  <label
+                    htmlFor="category"
+                    className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
+                  >
+                    Category
+                  </label>
+                  <p
+                    className="text-xs text-gray-500 mt-2 cursor-pointer"
+                    onClick={() => console.log("Add New Category")}
+                  >
+                    + Add New Category
+                  </p>
+                </div>
+
+                <div className="relative w-1/2">
                   <input
                     type="text"
-                    id="productName"
+                    id="unit"
                     className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
                     placeholder=" "
                   />
                   <label
-                    htmlFor="productName"
+                    htmlFor="unit"
                     className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                   >
-                    Product Name
+                    Unit
                   </label>
                 </div>
+              </div>
 
-                <div className="relative mb-6">
-                  <input
-                    type="text"
-                    id="brand"
-                    className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
-                    placeholder=" "
-                  />
-                  <label
-                    htmlFor="brand"
-                    className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                  >
-                    Brand
-                  </label>
-                </div>
+              <div className="relative ">
+                <p className="text-[14px] mb-1">
+                  Base SKU *{" "}
+                  <span className="text-gray-500 text-[10px]">
+                    (Auto-generated)
+                  </span>
+                </p>
+                <input
+                  type="number"
+                  id="threshold"
+                  className="block px-2.5 pb-3 pt-3 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer placeholder:text-[12px] mb-1"
+                  placeholder="Auto-generated from product name"
+                  disabled
+                />
+                <span className="flex items-center gap-1">
+                  <input type="checkbox" />
+                  <p className="text-[12px]">Taxable</p>
+                </span>
+              </div>
 
-                <div className="flex gap-3 w-full mb-6">
-                  <div className="relative flex-1">
-                    <select
-                      id="category"
-                      className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+              <div className="flex items-center gap-2 justify-between  text-sm text-gray-500">
+                <p>Has Variation</p>
+                <Switch />
+              </div>
+
+              <div className="flex flex-col text-sm text-gray-500">
+                <p>Product Description</p>
+                <Textarea label="Description" className="w-full -mt-2" />
+              </div>
+
+              <div className="flex flex-col gap-2 text-sm text-gray-500 ">
+                <p>Product Image</p>
+                <div className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100  ">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                    <svg
+                      stroke="currentColor"
+                      fill="currentColor"
+                      strokeWidth="0"
+                      viewBox="0 0 32 32"
+                      className="w-8 h-8 mb-4 text-primary"
+                      height="1em"
+                      width="1em"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <option value=""> </option>
-                      <option value="Category 1">Category 1</option>
-                      <option value="Category 2">Category 2</option>
-                      <option value="Category 3">Category 3</option>
-                    </select>
-                    <label
-                      htmlFor="category"
-                      className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                    >
-                      Category
-                    </label>
+                      <path d="M 16 7 C 13.351563 7 11.050781 8.238281 9.40625 10.0625 C 9.269531 10.046875 9.148438 10 9 10 C 6.800781 10 5 11.800781 5 14 C 3.269531 15.054688 2 16.835938 2 19 C 2 22.300781 4.699219 25 8 25 L 13 25 L 13 23 L 8 23 C 5.78125 23 4 21.21875 4 19 C 4 17.339844 5.007813 15.921875 6.4375 15.3125 L 7.125 15.03125 L 7.03125 14.28125 C 7.011719 14.117188 7 14.023438 7 14 C 7 12.882813 7.882813 12 9 12 C 9.140625 12 9.296875 12.019531 9.46875 12.0625 L 10.09375 12.21875 L 10.46875 11.71875 C 11.75 10.074219 13.75 9 16 9 C 19.277344 9 22.011719 11.253906 22.78125 14.28125 L 22.96875 15.0625 L 23.8125 15.03125 C 24.023438 15.019531 24.070313 15 24 15 C 26.21875 15 28 16.78125 28 19 C 28 21.21875 26.21875 23 24 23 L 19 23 L 19 25 L 24 25 C 27.300781 25 30 22.300781 30 19 C 30 15.84375 27.511719 13.316406 24.40625 13.09375 C 23.183594 9.574219 19.925781 7 16 7 Z M 16 15 L 12 19 L 15 19 L 15 27 L 17 27 L 17 19 L 20 19 Z"></path>
+                    </svg>
+                    <p className="mb-2 text-sm text-primary">
+                      <span className="font-semibold">Upload Main Image</span>
+                    </p>
+                    <p className="text-xs text-primary">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
                   </div>
+                  <input
+                    accept="image/*"
+                    multiple={false}
+                    tabIndex={-1}
+                    type="file"
+                    style={{
+                      border: "0px",
+                      clip: "rect(0px, 0px, 0px, 0px)",
+                      clipPath: "inset(50%)",
+                      height: "1px",
+                      margin: "0px -1px -1px 0px",
+                      overflow: "hidden",
+                      padding: "0px",
+                      position: "absolute",
+                      width: "1px",
+                      whiteSpace: "nowrap",
+                    }}
+                  />
+                </div>
+              </div>
 
-                  <div className="relative w-1/2">
+              <div className="flex items-center justify-between text-sm">
+                <p>Additional Images</p>
+                <RegularButton
+                  label="Add more"
+                  className="text-xs"
+                  onClick={handleAddImage}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-gray-500">
+                {additionalImage.map((image) => (
+                  <div
+                    className="flex flex-col items-center justify-center w-full h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    key={image}
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                      <svg
+                        stroke="currentColor"
+                        fill="currentColor"
+                        strokeWidth="0"
+                        viewBox="0 0 32 32"
+                        className="w-8 h-8 mb-4 text-primary"
+                        height="1em"
+                        width="1em"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M 16 7 C 13.351563 7 11.050781 8.238281 9.40625 10.0625 C 9.269531 10.046875 9.148438 10 9 10 C 6.800781 10 5 11.800781 5 14 C 3.269531 15.054688 2 16.835938 2 19 C 2 22.300781 4.699219 25 8 25 L 13 25 L 13 23 L 8 23 C 5.78125 23 4 21.21875 4 19 C 4 17.339844 5.007813 15.921875 6.4375 15.3125 L 7.125 15.03125 L 7.03125 14.28125 C 7.011719 14.117188 7 14.023438 7 14 C 7 12.882813 7.882813 12 9 12 C 9.140625 12 9.296875 12.019531 9.46875 12.0625 L 10.09375 12.21875 L 10.46875 11.71875 C 11.75 10.074219 13.75 9 16 9 C 19.277344 9 22.011719 11.253906 22.78125 14.28125 L 22.96875 15.0625 L 23.8125 15.03125 C 24.023438 15.019531 24.070313 15 24 15 C 26.21875 15 28 16.78125 28 19 C 28 21.21875 26.21875 23 24 23 L 19 23 L 19 25 L 24 25 C 27.300781 25 30 22.300781 30 19 C 30 15.84375 27.511719 13.316406 24.40625 13.09375 C 23.183594 9.574219 19.925781 7 16 7 Z M 16 15 L 12 19 L 15 19 L 15 27 L 17 27 L 17 19 L 20 19 Z"></path>
+                      </svg>
+                      <p className="mb-2 text-sm text-primary">
+                        <span className="font-semibold">Upload Main Image</span>
+                      </p>
+                      <p className="text-xs text-primary">
+                        PNG, JPG, GIF up to 10MB
+                      </p>
+                    </div>
                     <input
-                      type="text"
-                      id="unit"
-                      className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
-                      placeholder=" "
+                      accept="image/*"
+                      multiple={false}
+                      tabIndex={-1}
+                      type="file"
+                      style={{
+                        border: "0px",
+                        clip: "rect(0px, 0px, 0px, 0px)",
+                        clipPath: "inset(50%)",
+                        height: "1px",
+                        margin: "0px -1px -1px 0px",
+                        overflow: "hidden",
+                        padding: "0px",
+                        position: "absolute",
+                        width: "1px",
+                        whiteSpace: "nowrap",
+                      }}
                     />
-                    <label
-                      htmlFor="unit"
-                      className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                    >
-                      Unit
-                    </label>
                   </div>
-                </div>
-
-                <div className="relative ">
-                  <input
-                    type="number"
-                    id="threshold"
-                    className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
-                    placeholder=" "
-                  />
-                  <label
-                    htmlFor="threshold"
-                    className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                  >
-                    Threshold
-                  </label>
-                </div>
+                ))}
               </div>
             </div>
-            <div className="text-gray-600 w-full md:w-1/3">
-              <div className="flex justify-center md:justify-end gap-3">
-                <RegularButton
-                  label={
-                    <p className="text-sm flex items-center justify-self-center gap-2">
-                      <PlusIcon className="w-4 h-4" /> Bulk Product Add
-                    </p>
-                  }
-                  className="!bg-transparent !text-gray-600 !border !border-gray-600 w-1/2 !py-2 !px-2"
-                  onClick={() => setBulkProduct(true)}
-                />
-                <RegularButton
-                  label={<p className="text-sm">Save & Publish</p>}
-                  className="w-1/2"
+
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 h-fit">
+              <div className="flex items-center justify-between">
+                <p className="text-gray-700 text-sm">Variant Management</p>
+                <Switch
+                  className=""
+                  // checked={variantManagement}
+                  checked={true}
+                  onClick={() => {
+                    if (true) {
+                      toast.error("Please select a category");
+                    }
+                  }}
+                  onChange={() => setVariantManagement(!variantManagement)}
+                  disabled={true}
                 />
               </div>
-              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 mt-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-gray-700 text-sm">Variant Management</p>
-                  <Switch
-                    className=""
-                    checked={variantManagement}
-                    onClick={() => {
-                      if (true) {
-                        toast.error("Please select a category");
-                      }
-                    }}
-                    onChange={() => setVariantManagement(!variantManagement)}
-                    disabled={true}
+              {variantManagement && (
+                <div className="mt-3">
+                  <div className="border border-gray-300 rounded-md p-2">
+                    <div className="flex flex-col gap-1 mb-2">
+                      <p className="text-sm">Variants</p>
+                      <p className="text-xs text-gray-600">
+                        Add or create variations for your product. e.g., Size,
+                        Color.
+                      </p>
+                    </div>
+                    <Select.Root>
+                      <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2 w-full rounded-sm text-gray-600 border border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <Select.Value placeholder="Select an option" />
+                        <FaAngleDown className="text-gray-500" />
+                      </Select.Trigger>
+
+                      <Select.Portal>
+                        <Select.Content className="bg-white rounded-md shadow-lg">
+                          <Select.Viewport className="p-1">
+                            <Select.Item
+                              value="car"
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
+                            >
+                              <Select.ItemText>Car</Select.ItemText>
+                            </Select.Item>
+
+                            <Select.Item
+                              value="pencil"
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
+                            >
+                              <Select.ItemText>Pencil</Select.ItemText>
+                            </Select.Item>
+                          </Select.Viewport>
+                          <Select.Arrow />
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                    <div className="card bg-gray-50 border border-gray-300 mt-3 rounded flex flex-col gap-2 p-3">
+                      <p>Yoo</p>
+                      <div className="flex flex-wrap">
+                        <p className="flex items-center px-2 py-1 border border-gray-300 rounded bg-gray-200 relative text-xs gap-2">
+                          Yoo
+                          <span className="">
+                            <AiOutlineClose />
+                          </span>
+                        </p>
+                      </div>
+                      <input type=" border border-2" />
+                    </div>
+                  </div>
+                  <RegularButton
+                    label="Generate Variant"
+                    className="w-full text-sm mt-3"
                   />
+                  <div className="flex justify-between items-center mt-3">
+                    <p>Add image variant</p> <Switch />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
       {activeSection === "order" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
           {/* Big Bar Chart */}
           <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900">
             <h3 className="text-md font-semibold mb-2">Orders</h3>
@@ -907,11 +980,7 @@ const Page = () => {
               <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
                 <div className="flex items-center gap-2 justify-between w-full">
                   <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Search by Order Name / ID"
-                      className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                    />
+                    <SectionTabInput placeholder="Search by Order Name / ID" />
                   </div>
                   <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                     <SelectDropdown
@@ -1082,117 +1151,8 @@ const Page = () => {
                   </table>
                 </div>
               </div>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-                <div className="flex flex-1 justify-between sm:hidden">
-                  <a
-                    href="#"
-                    className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Previous
-                  </a>
-                  <a
-                    href="#"
-                    className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Next
-                  </a>
-                </div>
-                <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-gray-700">
-                      Showing <span className="font-medium">1</span> to{" "}
-                      <span className="font-medium">5</span> of{" "}
-                      <span className="font-medium">24</span> results
-                    </p>
-                  </div>
-                  <div>
-                    <nav
-                      className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                      aria-label="Pagination"
-                    >
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        <span className="sr-only">Previous</span>
-                        <svg
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 01.02-1.06z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </a>
-                      <a
-                        href="#"
-                        aria-current="page"
-                        className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      >
-                        1
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        2
-                      </a>
-                      <a
-                        href="#"
-                        className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                      >
-                        3
-                      </a>
-                      <span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0">
-                        ...
-                      </span>
-                      <a
-                        href="#"
-                        className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                      >
-                        8
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        9
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        10
-                      </a>
-                      <a
-                        href="#"
-                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                      >
-                        <span className="sr-only">Next</span>
-                        <svg
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06.02z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </a>
-                    </nav>
-                  </div>
-                </div>
-              </div>
             </div>
+            {/* Pagination */}
 
             <div className="flex items-center justify-between mt-10">
               <p className="text-xs text-gray-500">Total Stocks: 374</p>
@@ -1207,7 +1167,7 @@ const Page = () => {
       )}
 
       {activeSection === "stock" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 mb-6">
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
           {/* Big Bar Chart */}
           <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 space-y-6">
             <h3 className="text-md font-semibold mb-2">Stocks</h3>
@@ -1247,11 +1207,7 @@ const Page = () => {
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
                 <div className="relative flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search by Order Name / ID"
-                    className="w-full h-8 bg-gray-100 p-2 border border-gray-300 rounded-md text-gray-600 placeholder:text-gray-400 placeholder:text-xs md:text-sm"
-                  />
+                  <SectionTabInput placeholder="Search by Order Name / ID" />
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                   <SelectDropdown
@@ -1435,18 +1391,16 @@ const Page = () => {
         </div>
       )}
 
-      {activeSection !== "overview" &&
-        activeSection !== "products" &&
-        activeSection !== "order" && (
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
-              <p className="text-sm">
-                {SECTION_TABS.find((s) => s.key === activeSection)?.label}{" "}
-                content will appear here.
-              </p>
-            </div>
+      {activeSection === "configuration" && (
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+            <p className="text-sm">
+              {SECTION_TABS.find((s) => s.key === activeSection)?.label} content
+              will appear here.
+            </p>
           </div>
-        )}
+        </div>
+      )}
       <Toast />
     </main>
   );

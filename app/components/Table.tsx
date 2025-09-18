@@ -65,108 +65,259 @@ export function Table<T extends object>({
   };
 
   return (
-    <div className={`overflow-x-auto ${className}`}>
-      <table className="min-w-full divide-y divide-gray-200 border-1 border-gray-700 rounded-lg">
-        <thead className="rounded">
-          <tr>
-            {columns.map((column, index) => (
-              <th
-                key={index}
-                scope="col"
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider ${
-                  column.sortable
-                    ? "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-                    : ""
-                }`}
-                onClick={() =>
-                  column.sortable && typeof column.accessor === "string"
-                    ? requestSort(column.accessor as keyof T)
-                    : null
-                }
-                style={{ width: column.width }}
-              >
-                <div className="flex items-center">
-                  {column.header}
-                  {column.sortable && sortConfig.key === column.accessor && (
-                    <span className="ml-1">
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
+    <div className="overflow-hidden shadow rounded-lg">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
+          <thead className="bg-gray-50">
+            <tr className="hidden sm:table-row">
+              <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
+                Base SKU
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-          {paginatedData.length > 0 ? (
-            paginatedData.map((row, rowIndex) => (
-              <tr
-                key={getRowKey(row, rowIndex)}
-                className={`${
-                  onRowClick
-                    ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                    : ""
-                }`}
-                onClick={() => onRowClick?.(row)}
-              >
-                {columns.map((column, colIndex) => (
+              <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                Product Name
+              </th>
+              <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                Category
+              </th>
+              <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                Brand
+              </th>
+              <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                Threshold
+              </th>
+              <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
+                Has Variation
+              </th>
+              <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                <span className="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {[
+              {
+                id: 1,
+                baseSKU: "123456",
+                productName: "Product 1",
+                category: "Category 1",
+                brand: "Brand 1",
+                threshold: 10,
+                hasVariation: true,
+                status: "success",
+                statusText: "Successful",
+              },
+              {
+                id: 2,
+                baseSKU: "123456",
+                productName: "Product 2",
+                category: "Category 2",
+                brand: "Brand 2",
+                threshold: 20,
+                hasVariation: false,
+                status: "success",
+                statusText: "Successful",
+              },
+              {
+                id: 3,
+                baseSKU: "123456",
+                productName: "Product 3",
+                category: "Category 3",
+                brand: "Brand 3",
+                threshold: 30,
+                hasVariation: true,
+                status: "failed",
+                statusText: "Failed - Wrong Password",
+              },
+            ].map((item) => {
+              return (
+                <tr key={item.id} className="hover:bg-gray-50">
+                  {/* Date & Time */}
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
+                    <div className="sm:hidden mb-1 font-semibold">Base SKU</div>
+                    <div className="flex flex-col">
+                      <span>{item.baseSKU}</span>
+                      <span className="text-xs text-gray-500">
+                        {item.productName}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Device */}
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                    <div className="sm:hidden mb-1 font-semibold">
+                      Product Name
+                    </div>
+                    <div className="flex items-center">
+                      <div className="h-8 w-8 flex-shrink-0 bg-gray-100 rounded-md flex items-center justify-center"></div>
+                      <div className="ml-3">{item.productName}</div>
+                    </div>
+                  </td>
+
+                  {/* IP Address */}
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                    <div className="sm:hidden mb-1 font-semibold">Category</div>
+                    <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
+                      {item.category}
+                    </span>
+                  </td>
+
+                  {/* Location */}
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                    <div className="sm:hidden mb-1 font-semibold">Brand</div>
+                    <div className="flex items-center">{item.brand}</div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                    <div className="sm:hidden mb-1 font-semibold">
+                      Threshold
+                    </div>
+                    <div className="flex items-center">{item.threshold}</div>
+                  </td>
+
+                  {/* Status */}
+                  <td className="whitespace-nowrap px-3 py-4 text-sm">
+                    <div className="sm:hidden mb-1 font-semibold">
+                      Has Variation
+                    </div>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-gray-500`}
+                    >
+                      {item.hasVariation ? "Yes" : "No"}
+                    </span>
+                  </td>
+                  {/* Actions */}
+                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
+                    <div className="sm:hidden mb-2 font-semibold">Actions</div>
+                    <button
+                      type="button"
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      onClick={() => {
+                        // View details action
+                        console.log("View details for:", item.id);
+                      }}
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-600 hover:text-red-900"
+                      onClick={() => {
+                        // Report suspicious activity action
+                        console.log("Report suspicious activity:", item.id);
+                      }}
+                    >
+                      Report
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+interface StockTableProps<T extends Record<string, unknown>> {
+  columns: { key: keyof T; label: string }[];
+  rows: T[];
+  onEdit?: (item: T) => void;
+  onReport?: (item: T) => void;
+  onView?: (item: T) => void;
+  onDelete?: (item: T) => void;
+  className?: string;
+}
+
+export function StockTable<T extends Record<string, unknown>>({
+  columns,
+  rows,
+  onEdit,
+  onReport,
+  onView,
+  onDelete,
+  className,
+}: StockTableProps<T>) {
+  if (rows.length === 0) {
+    return (
+      <div className={`text-center py-8 ${className}`}>
+        <p className="text-gray-500">No items found</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`overflow-hidden shadow rounded-lg ${className}`}>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={String(col.key)}
+                  className="py-3.5 px-3 text-left font-semibold text-gray-900"
+                >
+                  {col.label}
+                </th>
+              ))}
+              {(onEdit || onDelete || onView || onReport) && (
+                <th className="px-3">Actions</th>
+              )}
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-gray-200 bg-white text-gray-500">
+            {rows.map((row, idx) => (
+              <tr key={idx} className="hover:bg-gray-50">
+                {columns.map((col) => (
                   <td
-                    key={colIndex}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100"
+                    key={String(col.key)}
+                    className="whitespace-nowrap px-3 py-4"
                   >
-                    {typeof column.accessor === "function"
-                      ? column.accessor(row)
-                      : String(row[column.accessor as keyof T])}
+                    {String(row[col.key] ?? "")}
                   </td>
                 ))}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
-              >
-                No data available
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
-            Showing{" "}
-            <span className="font-medium">
-              {(currentPage - 1) * pageSize + 1}
-            </span>{" "}
-            to{" "}
-            <span className="font-medium">
-              {Math.min(currentPage * pageSize, data.length)}
-            </span>{" "}
-            of <span className="font-medium">{data.length}</span> results
-          </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+                {(onEdit || onDelete || onView || onReport) && (
+                  <td className="whitespace-nowrap px-3 py-4 text-right">
+                    {onEdit && (
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        onClick={() => onEdit(row)}
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {onView && (
+                      <button
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        onClick={() => onView(row)}
+                      >
+                        View
+                      </button>
+                    )}
+                    {onDelete && (
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => onDelete(row)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                    {onReport && (
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => onReport(row)}
+                      >
+                        Report
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
