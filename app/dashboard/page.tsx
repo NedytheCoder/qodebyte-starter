@@ -620,7 +620,7 @@ const Page = () => {
 
             {/* Category Tabs */}
             <div>
-              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
+              <nav className="flex bg-white gap-5 md:w-fit" aria-label="Tabs">
                 <Pane
                   tabs={stock}
                   setActiveSection={(section: StockTab): void => {
@@ -716,7 +716,7 @@ const Page = () => {
             </div>
             {/* Category Tabs */}
             <div className="">
-              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
+              <nav className="flex bg-white gap-5 md:w-fit" aria-label="Tabs">
                 <Pane
                   tabs={saleTabs}
                   setActiveSection={(section: SaleFilter) =>
@@ -784,7 +784,7 @@ const Page = () => {
 
             {/* Category Tabs */}
             <div className="">
-              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
+              <nav className="flex bg-white gap-5 md:w-fit" aria-label="Tabs">
                 <Pane
                   tabs={loginTabs}
                   setActiveSection={(section: LoginFilter) =>

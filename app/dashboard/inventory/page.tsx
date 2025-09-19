@@ -18,10 +18,19 @@ import {
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { BsCart2 } from "react-icons/bs";
-import { FaArrowDown } from "react-icons/fa6";
+import { FaArrowDown, FaPlus } from "react-icons/fa6";
 import { Select } from "radix-ui";
 import { FaAngleDown } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
+import { Pane } from "@/app/components/Tabpane";
+import { DateRangeModal } from "@/app/components/DateRangeModal";
+import { StockTable } from "@/app/components/Table";
+import { AddCategoryModal } from "@/app/components/AddCategoryModal";
+import { AddCustomVariant } from "@/app/components/AddCustomVariant";
+import { BulkProductAdd } from "@/app/components/BulkProductAdd";
+import { BarChart as AppBarChart } from "@/app/components/charts";
+import { Bar } from "recharts";
+import VariantSide from "./VariantSide";
 
 const Page = () => {
   type TimeFilter =
@@ -39,7 +48,9 @@ const Page = () => {
   const [activeTime, setActiveTime] = useState<TimeFilter>("today");
   const [activeOrder, setActiveOrder] = useState<OrderFilter>("all");
   const [addProduct, setAddProduct] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isAddVariantOpen, setIsAddVariantOpen] = useState(false);
 
   const TIME_FILTERS: { key: TimeFilter; label: string }[] = [
     { key: "today", label: "Today" },
@@ -115,6 +126,12 @@ const Page = () => {
     { key: "stock", label: "Stock Management" },
     { key: "configuration", label: "Configuration" },
   ];
+  const CATEGORIES: { key: string; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "shoes", label: "Shoes" },
+    { key: "clothing", label: "Clothing" },
+    { key: "electronics", label: "Electronics" },
+  ];
 
   const barData = useMemo(
     () => [
@@ -128,6 +145,7 @@ const Page = () => {
     ],
     []
   );
+
   const pieData = useMemo(
     () => [
       { name: "Income", value: 20000000 },
@@ -150,66 +168,115 @@ const Page = () => {
       setAdditionalImage([...additionalImage, additionalImage.length + 1]);
     }
   };
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [customDate, setCustomDate] = useState("");
+  const variants = ["Color", "Size", "Material"];
+  const [hasVariation, setHasVariation] = useState(false);
+  const savedVariants = [
+    {
+      name: "Color",
+      values: ["Red", "Blue", "Green"],
+    },
+    {
+      name: "Size",
+      values: ["Small", "Medium", "Large"],
+    },
+    {
+      name: "Material",
+      values: [],
+    },
+  ];
+
+  const orderTabs: { key: OrderFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "awaiting_payment", label: "Awaiting Payment" },
+    { key: "paid", label: "Paid" },
+    { key: "delivered", label: "Delivered" },
+    { key: "canceled", label: "Canceled" },
+  ];
+
+  const configureTabs = [
+    { key: "category", label: "Category" },
+    { key: "attributes", label: "Attributes" },
+    { key: "taxes", label: "Taxes" },
+    { key: "discounts", label: "Discounts" },
+    { key: "coupons", label: "Coupons" },
+  ];
+  const [activeConfigure, setActiveConfigure] = useState("category");
+
   return (
     <main className="flex-1 w-full md:ml-64">
-      <div className="px-4 sm:px-6 lg:px-8 py-3">
+      <div className="px-4 sm:px-6 lg:px-8 mt-6">
         {/* Header Row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mt-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between my-2 gap-3 md:mt-2 -mb-2">
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">Inventory</h1>
+            <h1 className="md:text-xl font-semibold text-gray-900 -mb-2 md:mb-0">
+              Inventory
+            </h1>
           </div>
-          <div className="w-full md:flex md:justify-end mb-1">
-            <div className="mt-3 md:mt-0">
-              {activeSection === "products" && addProduct && (
-                <RegularButton
-                  label={
-                    <>
-                      <p className="flex items-center p-1 md:p-2 gap-2">
-                        <FaTable className="w-4 h-4" /> Show Table
-                      </p>
-                    </>
-                  }
-                  onClick={() => {
-                    setAddProduct(false);
-                  }}
-                  className="!px-2 !py-1 !text-sm !min-w-0 !shadow-none md:px-3 md:py-2"
-                />
-              )}
-              {activeSection === "products" && !addProduct && (
-                <RegularButton
-                  label={
-                    <>
-                      <p className="flex items-center p-1 md:p-2 gap-2">
-                        <PlusIcon className="w-4 h-4" /> Add a Product
-                      </p>
-                    </>
-                  }
-                  onClick={() => {
-                    setAddProduct(true);
-                  }}
-                  className="!px-2 !py-1 !text-sm !min-w-0 !shadow-none md:px-3 md:py-2"
-                />
-              )}
+          <div className={`w-full md:flex md:justify-end md:mb-2`}>
+            <div className="w-full md:w-auto border rounded-lg">
+              <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div className="flex gap-2 mt-2 md:mt-0">
+                  {activeSection === "overview" && (
+                    <Pane
+                      tabs={TIME_FILTERS}
+                      setActiveSection={(section: TimeFilter) =>
+                        setActiveTime(section)
+                      }
+                      activeSection={activeTime}
+                      setShowDateModal={(show: boolean): void => {
+                        setShowDateModal(show);
+                      }}
+                    />
+                  )}
+                  {activeSection === "products" && !addProduct && (
+                    <RegularButton
+                      onClick={() => setAddProduct(true)}
+                      label={
+                        <p className="text-sm flex items-center">
+                          <FaPlus /> Add Product
+                        </p>
+                      }
+                      className="text-sm"
+                    />
+                  )}
+                  {activeSection === "products" && addProduct && (
+                    <RegularButton
+                      onClick={() => setAddProduct(false)}
+                      label={
+                        <p className="text-sm flex items-center gap-2">
+                          <FaTable /> Show Table
+                        </p>
+                      }
+                      className="text-sm"
+                    />
+                  )}
 
-              {activeSection === "order" && (
-                <RegularButton
-                  label={
-                    <>
-                      <p className="flex items-center p-1 md:p-2 gap-2">
-                        <PlusIcon className="w-4 h-4" /> Create Order
-                      </p>
-                    </>
-                  }
-                  onClick={() => {}}
-                  className="!px-2 !py-1 !text-sm !min-w-0 !shadow-none md:px-3 md:py-2"
-                />
-              )}
+                  <DateRangeModal
+                    isOpen={showDateModal}
+                    onClose={() => setShowDateModal(false)}
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartDateChange={setStartDate}
+                    onEndDateChange={setEndDate}
+                    onApply={() => {
+                      if (startDate && endDate) {
+                        setCustomDate(`${startDate} to ${endDate}`);
+                        setActiveTime("custom");
+                      }
+                      setShowDateModal(false);
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
         {/* Lower grid: Pie + two tables */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4">
           {/* Overview */}
           {activeSection === "overview" && (
             <>
@@ -238,22 +305,17 @@ const Page = () => {
 
         {/* Tabs: Section Switcher */}
         <div className="w-full mb-1">
-          <div className="w-full border rounded-lg bg-white p-1">
+          <div className="w-full border rounded-lg bg-white p-1 md:mb-3">
             <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
               <div className="flex gap-2 md:justify-between">
-                {SECTION_TABS.map((t) => (
-                  <button
-                    key={t.key}
-                    className={`px-4 py-2 text-sm rounded-md whitespace-nowrap transition-colors ${
-                      activeSection === t.key
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                    onClick={() => setActiveSection(t.key)}
-                  >
-                    {t.label}
-                  </button>
-                ))}
+                <Pane
+                  tabs={SECTION_TABS}
+                  setActiveSection={(section: SectionTab) =>
+                    setActiveSection(section)
+                  }
+                  activeSection={activeSection}
+                  mainPane={true}
+                />
               </div>
             </div>
           </div>
@@ -363,8 +425,8 @@ const Page = () => {
                     <SelectDropdown
                       options={[
                         { value: "all", label: "Checkout List" },
-                        { value: "utilities", label: "Low Stock" },
-                        { value: "utilities", label: "Out Stock" },
+                        { value: "low_stock", label: "Low Stock" },
+                        { value: "out_stock", label: "Out Stock" },
                       ]}
                       placeholder="Check out date"
                       className="w-48"
@@ -406,22 +468,14 @@ const Page = () => {
             </div>
 
             {/* Category Tabs */}
-            <div className="">
-              <nav className="flex bg-white gap-5 w-fit" aria-label="Tabs">
-                {["All"].map((t) => (
-                  <button
-                    key={t}
-                    className={`px-4 py-2 text-xs md:text-sm rounded-md whitespace-nowrap transition-colors ${
-                      activeCategory === t
-                        ? "bg-indigo-600 text-white"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                    onClick={() => setActiveCategory(t)}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </nav>
+            <div className="md:w-fit mb-4">
+              <Pane
+                tabs={CATEGORIES}
+                setActiveSection={(section: string) =>
+                  setActiveCategory(section)
+                }
+                activeSection={activeCategory}
+              />
             </div>
 
             {/* Search and Filter */}
@@ -450,171 +504,54 @@ const Page = () => {
             </div>
 
             {/* Stock Table */}
-            <div className="overflow-hidden shadow rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
-                  <thead className="bg-gray-50">
-                    <tr className="hidden sm:table-row">
-                      <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
-                        Base SKU
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Product Name
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Category
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Brand
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Threshold
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Has Variation
-                      </th>
-                      <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                        <span className="sr-only">Actions</span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {[
-                      {
-                        id: 1,
-                        baseSKU: "123456",
-                        productName: "Product 1",
-                        category: "Category 1",
-                        brand: "Brand 1",
-                        threshold: 10,
-                        hasVariation: true,
-                        status: "success",
-                        statusText: "Successful",
-                      },
-                      {
-                        id: 2,
-                        baseSKU: "123456",
-                        productName: "Product 2",
-                        category: "Category 2",
-                        brand: "Brand 2",
-                        threshold: 20,
-                        hasVariation: false,
-                        status: "success",
-                        statusText: "Successful",
-                      },
-                      {
-                        id: 3,
-                        baseSKU: "123456",
-                        productName: "Product 3",
-                        category: "Category 3",
-                        brand: "Brand 3",
-                        threshold: 30,
-                        hasVariation: true,
-                        status: "failed",
-                        statusText: "Failed - Wrong Password",
-                      },
-                    ].map((item) => {
-                      return (
-                        <tr key={item.id} className="hover:bg-gray-50">
-                          {/* Date & Time */}
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Base SKU
-                            </div>
-                            <div className="flex flex-col">
-                              <span>{item.baseSKU}</span>
-                              <span className="text-xs text-gray-500">
-                                {item.productName}
-                              </span>
-                            </div>
-                          </td>
-
-                          {/* Device */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Product Name
-                            </div>
-                            <div className="flex items-center">
-                              <div className="h-8 w-8 flex-shrink-0 bg-gray-100 rounded-md flex items-center justify-center"></div>
-                              <div className="ml-3">{item.productName}</div>
-                            </div>
-                          </td>
-
-                          {/* IP Address */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Category
-                            </div>
-                            <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
-                              {item.category}
-                            </span>
-                          </td>
-
-                          {/* Location */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Brand
-                            </div>
-                            <div className="flex items-center">
-                              {item.brand}
-                            </div>
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Threshold
-                            </div>
-                            <div className="flex items-center">
-                              {item.threshold}
-                            </div>
-                          </td>
-
-                          {/* Status */}
-                          <td className="whitespace-nowrap px-3 py-4 text-sm">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Has Variation
-                            </div>
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-gray-500`}
-                            >
-                              {item.hasVariation ? "Yes" : "No"}
-                            </span>
-                          </td>
-                          {/* Actions */}
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                            <div className="sm:hidden mb-2 font-semibold">
-                              Actions
-                            </div>
-                            <button
-                              type="button"
-                              className="text-indigo-600 hover:text-indigo-900 mr-4"
-                              onClick={() => {
-                                // View details action
-                                console.log("View details for:", item.id);
-                              }}
-                            >
-                              View
-                            </button>
-                            <button
-                              type="button"
-                              className="text-red-600 hover:text-red-900"
-                              onClick={() => {
-                                // Report suspicious activity action
-                                console.log(
-                                  "Report suspicious activity:",
-                                  item.id
-                                );
-                              }}
-                            >
-                              Report
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <StockTable
+              columns={[
+                {
+                  key: "baseSKU",
+                  label: "Base SKU",
+                },
+                {
+                  key: "productName",
+                  label: "Product Name",
+                },
+                {
+                  key: "category",
+                  label: "Category",
+                },
+                {
+                  key: "brand",
+                  label: "Brand",
+                },
+                {
+                  key: "threshold",
+                  label: "Threshold",
+                },
+                {
+                  key: "hasVariation",
+                  label: "Has Variation",
+                },
+              ]}
+              rows={[
+                {
+                  baseSKU: "123456",
+                  productName: "Product 1",
+                  category: "Clothing",
+                  brand: "Brand 1",
+                  threshold: 10,
+                  hasVariation: "Yes",
+                },
+                {
+                  baseSKU: "123456",
+                  productName: "Product 1",
+                  category: "Electronics",
+                  brand: "Brand 1",
+                  threshold: 10,
+                  hasVariation: "No",
+                },
+              ]}
+              onView={() => console.log("View")}
+              onDelete={() => console.log("Delete")}
+            />
 
             {/* Pagination */}
             <Pagination
@@ -633,8 +570,13 @@ const Page = () => {
 
       {activeSection === "products" && addProduct && (
         <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
-          <div className="flex flex-col md:flex-row items-center justify-between w-full">
-            <p className="text-gray-800 text-sm">New Inventory Item</p>
+          <BulkProductAdd
+            isOpen={bulkProduct}
+            onClose={() => setBulkProduct(false)}
+            onAddProducts={(products) => console.log(products)}
+          />
+          <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between w-full gap-3 md:gap-0">
+            <p className="text-gray-800 text-md mt-5">New Inventory Item</p>
             <div className="flex gap-2">
               <RegularButton
                 label={
@@ -651,7 +593,7 @@ const Page = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-[2fr_1fr] gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 mb-6">
             <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 flex flex-col gap-6">
               <div className="relative ">
                 <input
@@ -702,10 +644,18 @@ const Page = () => {
                   </label>
                   <p
                     className="text-xs text-gray-500 mt-2 cursor-pointer"
-                    onClick={() => console.log("Add New Category")}
+                    onClick={() => setIsAddCategoryOpen(true)}
                   >
                     + Add New Category
                   </p>
+                  <AddCategoryModal
+                    isOpen={isAddCategoryOpen}
+                    onClose={() => setIsAddCategoryOpen(false)}
+                    onAddCategory={(category) => {
+                      console.log("New category:", category);
+                      // Add your logic to handle the new category
+                    }}
+                  />
                 </div>
 
                 <div className="relative w-1/2">
@@ -746,7 +696,10 @@ const Page = () => {
 
               <div className="flex items-center gap-2 justify-between  text-sm text-gray-500">
                 <p>Has Variation</p>
-                <Switch />
+                <Switch
+                  checked={hasVariation}
+                  onChange={() => setHasVariation(!hasVariation)}
+                />
               </div>
 
               <div className="flex flex-col text-sm text-gray-500">
@@ -857,79 +810,57 @@ const Page = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 h-fit">
-              <div className="flex items-center justify-between">
-                <p className="text-gray-700 text-sm">Variant Management</p>
-                <Switch
-                  className=""
-                  // checked={variantManagement}
-                  checked={true}
-                  onClick={() => {
-                    if (true) {
-                      toast.error("Please select a category");
-                    }
-                  }}
-                  onChange={() => setVariantManagement(!variantManagement)}
-                  disabled={true}
-                />
-              </div>
-              {variantManagement && (
-                <div className="mt-3">
-                  <div className="border border-gray-300 rounded-md p-2">
-                    <div className="flex flex-col gap-1 mb-2">
-                      <p className="text-sm">Variants</p>
-                      <p className="text-xs text-gray-600">
-                        Add or create variations for your product. e.g., Size,
-                        Color.
-                      </p>
-                    </div>
-                    <Select.Root>
-                      <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2 w-full rounded-sm text-gray-600 border border-gray-300 hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        <Select.Value placeholder="Select an option" />
-                        <FaAngleDown className="text-gray-500" />
-                      </Select.Trigger>
-
-                      <Select.Portal>
-                        <Select.Content className="bg-white rounded-md shadow-lg">
-                          <Select.Viewport className="p-1">
-                            <Select.Item
-                              value="car"
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
-                            >
-                              <Select.ItemText>Car</Select.ItemText>
-                            </Select.Item>
-
-                            <Select.Item
-                              value="pencil"
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
-                            >
-                              <Select.ItemText>Pencil</Select.ItemText>
-                            </Select.Item>
-                          </Select.Viewport>
-                          <Select.Arrow />
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                    <div className="card bg-gray-50 border border-gray-300 mt-3 rounded flex flex-col gap-2 p-3">
-                      <p>Yoo</p>
-                      <div className="flex flex-wrap">
-                        <p className="flex items-center px-2 py-1 border border-gray-300 rounded bg-gray-200 relative text-xs gap-2">
-                          Yoo
-                          <span className="">
-                            <AiOutlineClose />
-                          </span>
-                        </p>
-                      </div>
-                      <input type=" border border-2" />
-                    </div>
+              {!hasVariation && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <p className="text-gray-700 text-sm md:text-lg">
+                      Variant Management
+                    </p>
+                    <Switch
+                      className=""
+                      // checked={variantManagement}
+                      // checked={true}
+                      // onClick={() => {
+                      //   if (true) {
+                      //     toast.error("Please select a category");
+                      //   }
+                      // }}
+                      onChange={() => setVariantManagement(!variantManagement)}
+                      // disabled={}
+                    />
                   </div>
-                  <RegularButton
-                    label="Generate Variant"
-                    className="w-full text-sm mt-3"
+                  {variantManagement && (
+                    <VariantSide
+                      setIsAddVariantOpen={setIsAddVariantOpen}
+                      variants={variants}
+                      savedVariants={savedVariants}
+                    />
+                  )}
+                </>
+              )}
+              {hasVariation && (
+                <>
+                  <StockTable
+                    columns={[
+                      { key: "name", label: "Name" },
+                      { key: "costPrice", label: "Cost Price" },
+                      { key: "sellingPrice", label: "Selling Price" },
+                      { key: "quantity", label: "Quantity" },
+                      { key: "threshold", label: "Threshold" },
+                    ]}
+                    rows={[
+                      {
+                        name: "Color",
+                        costPrice: 100,
+                        sellingPrice: 150,
+                        quantity: 100,
+                        threshold: 100,
+                      },
+                    ]}
+                    onView={() => {}}
+                    onDelete={() => {}}
                   />
-                  <div className="flex justify-between items-center mt-3">
-                    <p>Add image variant</p> <Switch />
-                  </div>
-                </div>
+                </>
               )}
             </div>
           </div>
@@ -939,270 +870,29 @@ const Page = () => {
       {activeSection === "order" && (
         <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
           {/* Big Bar Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900">
-            <h3 className="text-md font-semibold mb-2">Orders</h3>
-            <p className="text-xs md:text-sm text-gray-600">
-              Track and manage product orders, including status, quantity and
-              customer details
-            </p>
-
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"></div>
-
-              {/* Category Tabs */}
-              <div className="w-full overflow-x-auto scrollbar-hide">
-                <div className="inline-flex w-fit bg-white p-1 rounded-lg">
-                  <nav className="flex space-x-1" aria-label="Tabs">
-                    {[
-                      "All",
-                      "Awaiting Payment",
-                      "Paid",
-                      "Delivered",
-                      "Cancelled",
-                    ].map((t) => (
-                      <button
-                        key={t}
-                        className={`px-3 py-2 text-xs md:text-sm rounded-md whitespace-nowrap transition-colors ${
-                          activeCategory === t
-                            ? "bg-indigo-600 text-white shadow-sm"
-                            : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                        onClick={() => setActiveCategory(t)}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-
-              {/* Search and Filter */}
-              <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
-                <div className="flex items-center gap-2 justify-between w-full">
-                  <div className="relative flex-1">
-                    <SectionTabInput placeholder="Search by Order Name / ID" />
-                  </div>
-                  <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
-                    <SelectDropdown
-                      options={[
-                        { value: "name-asc", label: "Name (A-Z)" },
-                        { value: "name-desc", label: "Name (Z-A)" },
-                        { value: "stock-asc", label: "Stock (Low to High)" },
-                        { value: "stock-desc", label: "Stock (High to Low)" },
-                      ]}
-                      placeholder="Sort by"
-                      className="w-full"
-                      onChange={(value) => {
-                        // Handle sort logic here
-                        console.log("Sort by:", value);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Stock Table */}
-              <div className="overflow-hidden shadow rounded-lg">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
-                    <thead className="bg-gray-50">
-                      <tr className="hidden sm:table-row">
-                        <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
-                          Order ID
-                        </th>
-                        <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                          Supplier
-                        </th>
-                        <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                          Order Date
-                        </th>
-                        <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                          Expected Delivery Date
-                        </th>
-                        <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
-                      {[
-                        {
-                          id: "#ORD-2023-1001",
-                          supplier: "GasPro Distributors",
-                          orderDate: "2023-09-15T09:30:00",
-                          deliveryDate: "2023-09-20T00:00:00",
-                          status: "pending",
-                          statusText: "Awaiting Payment",
-                        },
-                        {
-                          id: "#ORD-2023-1002",
-                          supplier: "FlameTech Energy",
-                          orderDate: "2023-09-14T11:20:00",
-                          deliveryDate: "2023-09-18T00:00:00",
-                          status: "processing",
-                          statusText: "Processing",
-                        },
-                        {
-                          id: "#ORD-2023-1003",
-                          supplier: "SafeGas Solutions",
-                          orderDate: "2023-09-10T14:45:00",
-                          deliveryDate: "2023-09-15T00:00:00",
-                          status: "shipped",
-                          statusText: "In Transit",
-                        },
-                      ].map((item) => {
-                        return (
-                          <tr key={item.id} className="hover:bg-gray-50">
-                            {/* Date & Time */}
-                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Order ID
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-xs text-gray-500">
-                                  {item.id}
-                                </span>
-                              </div>
-                            </td>
-
-                            {/* Device */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Supplier
-                              </div>
-                              <div className="flex items-center">
-                                <div className="ml-3">
-                                  <div className="font-medium text-gray-900">
-                                    {item.supplier}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* IP Address */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Order Date
-                              </div>
-                              <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
-                                {item.orderDate}
-                              </span>
-                            </td>
-
-                            {/* Location */}
-                            <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Expected Delivery Date
-                              </div>
-                              <div className="flex items-center">
-                                {item.deliveryDate}
-                              </div>
-                            </td>
-
-                            {/* Status */}
-                            <td className="whitespace-nowrap px-3 py-4 text-sm">
-                              <div className="sm:hidden mb-1 font-semibold">
-                                Status
-                              </div>
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  item.status === "success"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {item.statusText}
-                              </span>
-                            </td>
-
-                            {/* Actions */}
-                            <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                              <div className="sm:hidden mb-2 font-semibold">
-                                Actions
-                              </div>
-                              <button
-                                type="button"
-                                className="text-indigo-600 hover:text-indigo-900 mr-4"
-                                onClick={() => {
-                                  // View details action
-                                  console.log("View details for:", item.id);
-                                }}
-                              >
-                                View
-                              </button>
-                              <button
-                                type="button"
-                                className="text-red-600 hover:text-red-900"
-                                onClick={() => {
-                                  // Report suspicious activity action
-                                  console.log(
-                                    "Report suspicious activity:",
-                                    item.id
-                                  );
-                                }}
-                              >
-                                Report
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-5">
+              <div>
+                <h2 className="md:text-lg text-md font-semibold text-gray-900">
+                  Orders
+                </h2>
+                <p className="text-xs md:text-sm text-gray-500">
+                  Track and manage product orders, including status, quantity
+                  and customer details
+                </p>
               </div>
             </div>
-            {/* Pagination */}
 
-            <div className="flex items-center justify-between mt-10">
-              <p className="text-xs text-gray-500">Total Stocks: 374</p>
-              <Pagination
-                currentPage={1}
-                totalPages={2}
-                onPageChange={() => {}}
+            {/* Category Tabs */}
+            <div className="mt-4 md:w-fit">
+              <Pane
+                tabs={orderTabs}
+                setActiveSection={(section: OrderFilter) =>
+                  setActiveOrder(section)
+                }
+                activeSection={activeOrder}
               />
             </div>
-          </div>
-        </div>
-      )}
-
-      {activeSection === "stock" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
-          {/* Big Bar Chart */}
-          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 space-y-6">
-            <h3 className="text-md font-semibold mb-2">Stocks</h3>
-            <p className="text-xs md:text-sm text-gray-500">
-              Monitor the flow of your inventory in and out of the storage
-            </p>
-
-            <div className="w-full overflow-x-auto scrollbar-hide">
-              <div className="w-full overflow-x-auto scrollbar-hide">
-                <div className="inline-flex w-fit bg-white p-1 rounded-lg">
-                  <nav className="flex space-x-1" aria-label="Tabs">
-                    {[
-                      "All",
-                      "Awaiting Payment",
-                      "Paid",
-                      "Delivered",
-                      "Cancelled",
-                    ].map((t) => (
-                      <button
-                        key={t}
-                        className={`px-3 py-2 text-xs md:text-sm rounded-md whitespace-nowrap transition-colors ${
-                          activeCategory === t
-                            ? "bg-indigo-600 text-white shadow-sm"
-                            : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                        onClick={() => setActiveCategory(t)}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-            </div>
-
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
               <div className="flex items-center gap-2 justify-between w-full">
@@ -1229,179 +919,237 @@ const Page = () => {
             </div>
 
             {/* Stock Table */}
-            <div className="overflow-hidden shadow rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
-                  <thead className="bg-gray-50">
-                    <tr className="hidden sm:table-row">
-                      <th className="py-3.5 pl-4 pr-3 text-left font-semibold text-gray-900 sm:pl-6">
-                        Order ID
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Supplier
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Order Date
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Expected Delivery Date
-                      </th>
-                      <th className="px-3 py-3.5 text-left font-semibold text-gray-900">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
-                    {[
-                      {
-                        id: "#ORD-2023-1001",
-                        supplier: "GasPro Distributors",
-                        orderDate: "2023-09-15T09:30:00",
-                        deliveryDate: "2023-09-20T00:00:00",
-                        status: "pending",
-                        statusText: "Awaiting Payment",
-                      },
-                      {
-                        id: "#ORD-2023-1002",
-                        supplier: "FlameTech Energy",
-                        orderDate: "2023-09-14T11:20:00",
-                        deliveryDate: "2023-09-18T00:00:00",
-                        status: "processing",
-                        statusText: "Processing",
-                      },
-                      {
-                        id: "#ORD-2023-1003",
-                        supplier: "SafeGas Solutions",
-                        orderDate: "2023-09-10T14:45:00",
-                        deliveryDate: "2023-09-15T00:00:00",
-                        status: "shipped",
-                        statusText: "In Transit",
-                      },
-                    ].map((item) => {
-                      return (
-                        <tr key={item.id} className="hover:bg-gray-50">
-                          {/* Date & Time */}
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-gray-900 sm:pl-6">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Order ID
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="text-xs text-gray-500">
-                                {item.id}
-                              </span>
-                            </div>
-                          </td>
+            <StockTable
+              columns={[
+                { key: "orderId", label: "Order ID" },
+                { key: "supplier", label: "Supplier" },
+                { key: "orderDate", label: "Order Date" },
+                { key: "deliveryDate", label: "Expected Delivery Date" },
+                { key: "status", label: "Status" },
+              ]}
+              rows={[
+                {
+                  orderId: "#ORD-2023-1001",
+                  supplier: "FlameTech Energy",
+                  orderDate: "2023-09-14T11:20:00",
+                  deliveryDate: "2023-09-18T00:00:00",
+                  status: "Processing",
+                },
+                {
+                  orderId: "#ORD-2023-1002",
+                  supplier: "FlameTech Energy",
+                  orderDate: "2023-09-14T11:20:00",
+                  deliveryDate: "2023-09-18T00:00:00",
+                  status: "Processing",
+                },
+                {
+                  orderId: "#ORD-2023-1003",
+                  supplier: "SafeGas Solutions",
+                  orderDate: "2023-09-10T14:45:00",
+                  deliveryDate: "2023-09-15T00:00:00",
+                  status: "Shipped",
+                },
+              ]}
+              onView={() => {}}
+              onReport={() => {}}
+            />
 
-                          {/* Device */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Supplier
-                            </div>
-                            <div className="flex items-center">
-                              <div className="ml-3">
-                                <div className="font-medium text-gray-900">
-                                  {item.supplier}
-                                </div>
-                              </div>
-                            </div>
-                          </td>
+            {/* Pagination */}
+            <Pagination
+              currentPage={1}
+              totalPages={2}
+              onPageChange={(page) => console.log("Page changed to:", page)}
+              label={
+                <>
+                  <p>Time Stock: 0</p>
+                </>
+              }
+            />
+          </div>
+        </div>
+      )}
 
-                          {/* IP Address */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Order Date
-                            </div>
-                            <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-mono">
-                              {item.orderDate}
-                            </span>
-                          </td>
-
-                          {/* Location */}
-                          <td className="whitespace-nowrap px-3 py-4 text-gray-500">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Expected Delivery Date
-                            </div>
-                            <div className="flex items-center">
-                              {item.deliveryDate}
-                            </div>
-                          </td>
-
-                          {/* Status */}
-                          <td className="whitespace-nowrap px-3 py-4 text-sm">
-                            <div className="sm:hidden mb-1 font-semibold">
-                              Status
-                            </div>
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                item.status === "success"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {item.statusText}
-                            </span>
-                          </td>
-
-                          {/* Actions */}
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right font-medium sm:pr-6">
-                            <div className="sm:hidden mb-2 font-semibold">
-                              Actions
-                            </div>
-                            <button
-                              type="button"
-                              className="text-indigo-600 hover:text-indigo-900 mr-4"
-                              onClick={() => {
-                                // View details action
-                                console.log("View details for:", item.id);
-                              }}
-                            >
-                              View
-                            </button>
-                            <button
-                              type="button"
-                              className="text-red-600 hover:text-red-900"
-                              onClick={() => {
-                                // Report suspicious activity action
-                                console.log(
-                                  "Report suspicious activity:",
-                                  item.id
-                                );
-                              }}
-                            >
-                              Report
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+      {activeSection === "stock" && (
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
+          {/* Big Bar Chart */}
+          <div className="p-4 sm:p-1 overflow-hidden md:mb-7 mb-4 mt-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                  Stocks
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  Monitor the flow of your inventory in and out of the storage
+                </p>
+              </div>
+              <div className="text-gray-900 flex flex-col md:flex-row items-center md:items-start gap-2">
+                <p className="flex items-center gap-1 text-xs md:text-base">
+                  <span className="w-3 h-3 rounded-lg bg-green-500"></span>
+                  Income
+                </p>
+                <p className="flex items-center gap-1 text-xs md:text-base">
+                  <span className="w-3 h-3 rounded-lg bg-red-500"></span>
+                  Expenses
+                </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-10">
-              <p className="text-xs text-gray-500">Total Stocks: 374</p>
-              <Pagination
-                currentPage={1}
-                totalPages={2}
-                onPageChange={() => {}}
-              />
+            <div className="h-72 mt-3 md:mt-0">
+              <AppBarChart
+                data={barData}
+                dataKey="income"
+                xAxisKey="time"
+                title="Income and Expenses"
+                description="Daily income and expenses overview"
+                width="100%"
+                height="100%"
+                className="h-full"
+                fillColor="#10B981"
+                strokeColor="#10B981"
+                showLegend={false}
+              >
+                <Bar
+                  dataKey="expenses"
+                  name="Expenses"
+                  fill="#EF4444"
+                  stroke="#EF4444"
+                />
+              </AppBarChart>
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
+            <div className="flex items-center gap-2 justify-between w-full">
+              <div className="relative flex-1">
+                <SectionTabInput placeholder="Search by Order Name / ID" />
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
+                <SelectDropdown
+                  options={[
+                    { value: "name-asc", label: "Name (A-Z)" },
+                    { value: "name-desc", label: "Name (Z-A)" },
+                    { value: "stock-asc", label: "Stock (Low to High)" },
+                    { value: "stock-desc", label: "Stock (High to Low)" },
+                  ]}
+                  placeholder="Sort by"
+                  className="w-full"
+                  onChange={(value) => {
+                    // Handle sort logic here
+                    console.log("Sort by:", value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <StockTable
+            columns={[
+              { key: "item", label: "Item" },
+              { key: "date", label: "Date" },
+              { key: "type", label: "Type" },
+              { key: "quantity", label: "Quantity" },
+              { key: "addedBy", label: "Added By" },
+              { key: "status", label: "Status" },
+            ]}
+            rows={[
+              {
+                item: "Spoon",
+                date: "",
+                type: "",
+                quantity: 0,
+                addedBy: "",
+                status: "",
+              },
+              {
+                item: "Spoon",
+                date: "",
+                type: "",
+                quantity: 0,
+                addedBy: "",
+                status: "",
+              },
+            ]}
+            onView={() => {}}
+            className="mb-6"
+          />
         </div>
       )}
 
       {activeSection === "configuration" && (
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
-            <p className="text-sm">
-              {SECTION_TABS.find((s) => s.key === activeSection)?.label} content
-              will appear here.
-            </p>
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
+          {/* Big Bar Chart */}
+          <div className="mt-4 md:w-fit">
+            <Pane
+              tabs={configureTabs}
+              setActiveSection={(section: string) =>
+                setActiveConfigure(section)
+              }
+              activeSection={activeConfigure}
+            />
           </div>
+
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
+            <div className="flex items-center gap-2 justify-between w-full">
+              <div className="relative flex-1">
+                <SectionTabInput placeholder="Search by Category" />
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
+                <SelectDropdown
+                  options={[
+                    { value: "name-asc", label: "Name (A-Z)" },
+                    { value: "name-desc", label: "Name (Z-A)" },
+                    { value: "stock-asc", label: "Stock (Low to High)" },
+                    { value: "stock-desc", label: "Stock (High to Low)" },
+                  ]}
+                  placeholder="Sort by"
+                  className="w-full"
+                  onChange={(value) => {
+                    // Handle sort logic here
+                    console.log("Sort by:", value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Stock Table */}
+          <StockTable
+            columns={[
+              { key: "categoryId", label: "Category ID" },
+              { key: "category", label: "Category" },
+            ]}
+            rows={[
+              {
+                categoryId: "#ORD-2023-1001",
+                category: "FlameTech Energy",
+              },
+            ]}
+            onView={() => {}}
+            onReport={() => {}}
+          />
+
+          {/* Pagination */}
+          <Pagination
+            currentPage={1}
+            totalPages={2}
+            onPageChange={(page) => console.log("Page changed to:", page)}
+            label={
+              <>
+                <p>Time Stock: 0</p>
+              </>
+            }
+          />
         </div>
       )}
       <Toast />
+      <AddCustomVariant
+        isOpen={isAddVariantOpen}
+        onClose={() => setIsAddVariantOpen(false)}
+        onAddvariant={(variant: { name: string }) => {
+          console.log(variant);
+        }}
+      />
     </main>
   );
 };

@@ -79,7 +79,7 @@ Input.displayName = "Input";
 
 interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "className"> {
-  label: string;
+  label?: string;
   error?: boolean;
   className?: string;
 }
@@ -100,14 +100,21 @@ export function Textarea({
     <div className={inputClasses}>
       <textarea
         autoComplete="off"
-        className={`${
-          error ? styles.error : ""
-        } ${className} border-1 border-gray-300 rounded-md h-36 resize-none`}
+        className={`${error ? styles.error : ""} ${
+          props.value ? "pt-3" : ""
+        } ${className} w-full px-3 py-2 border border-gray-300 rounded-md h-36 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
         {...textareaProps}
       />
-      <label htmlFor={textareaProps.name} className={error ? styles.error : ""}>
-        {label}
-      </label>
+      {label && (
+        <label
+          htmlFor={textareaProps.name}
+          className={`${error ? styles.error : ""} ${
+            props.value ? styles.filled : ""
+          }`}
+        >
+          {label}
+        </label>
+      )}
     </div>
   );
 }
@@ -318,10 +325,10 @@ export function Switch({
       <input
         type="checkbox"
         value=""
-        checked={checked}
+        // checked={checked}
         className="sr-only peer disabled:opacity-50 disabled:cursor-not-allowed"
         {...props}
-        disabled={disabled}
+        // disabled={disabled}
       />
       <div className="group peer ring-0 bg-gradient-to-bl from-neutral-800 via-neutral-700 to-neutral-600 rounded-full outline-none duration-1000 after:duration-300 w-12 h-6 shadow-md peer-focus:outline-none after:content-[''] after:rounded-full after:absolute after:[background:#0D2B39] peer-checked:after:rotate-180 after:[background:conic-gradient(from_135deg,_#b2a9a9,_#b2a8a8,_#ffffff,_#d7dbd9_,_#ffffff,_#b2a8a8)] after:outline-none after:h-4 after:w-4 after:top-1 after:left-1 peer-checked:after:translate-x-6 peer-hover:after:scale-95 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-emerald-900"></div>
     </label>

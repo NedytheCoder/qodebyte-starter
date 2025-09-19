@@ -52,6 +52,21 @@ export function Pane<T extends string = string>({
                 4
               </span>
             )}
+            {t.key === "products" && (
+              <span className="absolute top-0 -right-1 md:right-0 w-4 h-4 md:w-4 md:h-4 flex items-center justify-center bg-red-400 rounded-full text-white text-[10px] sm:text-xs">
+                4
+              </span>
+            )}
+            {t.key === "configuration" && (
+              <span className="absolute top-0 -right-1 md:right-0 w-4 h-4 md:w-4 md:h-4 flex items-center justify-center bg-red-400 rounded-full text-white text-[10px] sm:text-xs">
+                4
+              </span>
+            )}
+            {t.key === "order" && (
+              <span className="absolute top-0 -right-1 md:right-0 w-4 h-4 md:w-4 md:h-4 flex items-center justify-center bg-red-400 rounded-full text-white text-[10px] sm:text-xs">
+                4
+              </span>
+            )}
           </button>
         ))}
       </div>

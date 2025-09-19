@@ -20,7 +20,7 @@ export function RegularButton({
       className={`
         ${className} 
         relative rounded-lg border border-transparent px-4 py-2 
-        text-base font-medium bg-gray-900 text-white
+        text-base font-medium bg-gray-800 text-white
         transition-colors duration-200 
         ${
           disabled || loading

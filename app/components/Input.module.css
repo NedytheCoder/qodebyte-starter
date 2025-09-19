@@ -87,7 +87,7 @@
     color: rgb(180, 180, 180);
   }
   
-  .inputGroup :is(input:focus, input:valid)~label {
+  .inputGroup :is(input:focus, input:valid, textarea:focus, textarea:valid, .filled)~label {
     transform: translateY(-50%) scale(.9);
     margin: 0em;
     margin-left: 1.3em;
@@ -97,4 +97,19 @@
   
   .inputGroup :is(input:focus, input:valid) {
     border-color: rgb(150, 150, 200);
+  }
+
+  .inputGroup textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
+  /* Error state for the textarea */
+  .inputGroup.error textarea {
+    border-color: #ef4444 !important;
+  }
+
+  .inputGroup.error textarea:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
   }
