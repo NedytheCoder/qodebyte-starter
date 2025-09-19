@@ -10,14 +10,19 @@ interface AddCustomVariantProps {
   isOpen: boolean;
   onClose: () => void;
   onAddvariant: (variant: { name: string }) => void;
+  variantName: string;
+  handleAddVariant: () => void;
+  setVariantName: (name: string) => void;
 }
 
 export function AddCustomVariant({
   isOpen,
   onClose,
   onAddvariant,
+  variantName,
+  setVariantName,
+  handleAddVariant,
 }: AddCustomVariantProps) {
-  const [variantName, setVariantName] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,9 +31,7 @@ export function AddCustomVariant({
       setError("Variant name is required");
       return;
     }
-    onAddvariant({
-      name: variantName.trim(),
-    });
+    handleAddVariant();
     setVariantName("");
     setError("");
     onClose();

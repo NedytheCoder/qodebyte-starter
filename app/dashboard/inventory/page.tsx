@@ -172,22 +172,44 @@ const Page = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [customDate, setCustomDate] = useState("");
-  const variants = ["Color", "Size", "Material"];
+  const [variants, setVariants] = useState<string[]>([]);
   const [hasVariation, setHasVariation] = useState(false);
-  const savedVariants = [
-    {
-      name: "Color",
-      values: ["Red", "Blue", "Green"],
-    },
-    {
-      name: "Size",
-      values: ["Small", "Medium", "Large"],
-    },
-    {
-      name: "Material",
+  const [variantName, setVariantName] = useState("");
+  const [savedVariants, setSavedVariants] = useState<
+    { name: string; values: string[] }[]
+  >([]);
+
+  const handleAddVariant = () => {
+    const name = variantName.trim();
+    if (!name) {
+      toast.error("Variant name is required");
+      return;
+    }
+    // Prevent duplicates (case-insensitive) in both lists
+    const existsInVariants = variants.some(
+      (v) => v.toLowerCase() === name.toLowerCase()
+    );
+    const existsInSaved = savedVariants.some(
+      (v) => v.name.toLowerCase() === name.toLowerCase()
+    );
+    if (existsInVariants || existsInSaved) {
+      toast.error("Variant already exists");
+      return;
+    }
+
+    // Update simple variants list (used for selection elsewhere)
+    setVariants((prev) => [...prev, name]);
+
+    // Update detailed saved variants list
+    const newVariant = {
+      name,
       values: [],
-    },
-  ];
+    };
+    setSavedVariants([...savedVariants, newVariant]);
+    setVariantName("");
+    setIsAddVariantOpen(false);
+    toast.success("Variant added successfully");
+  };
 
   const orderTabs: { key: OrderFilter; label: string }[] = [
     { key: "all", label: "All" },
@@ -206,20 +228,22 @@ const Page = () => {
   ];
   const [activeConfigure, setActiveConfigure] = useState("category");
 
+  const categoriesprod = ["Shoes", "Clothing", "Electronics"];
+
   return (
     <main className="flex-1 w-full md:ml-64">
       <div className="px-4 sm:px-6 lg:px-8 mt-6">
         {/* Header Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between my-2 gap-3 md:mt-2 -mb-2">
           <div>
-            <h1 className="md:text-xl font-semibold text-gray-900 -mb-2 md:mb-0">
+            <h1 className="md:text-xl text-lg font-semibold text-gray-900 -mb-2 md:mb-0">
               Inventory
             </h1>
           </div>
           <div className={`w-full md:flex md:justify-end md:mb-2`}>
             <div className="w-full md:w-auto border rounded-lg">
               <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <div className="flex gap-2 mt-2 md:mt-0">
+                <div className="flex gap-2 mt-2 md:mt-0 mb-6 ">
                   {activeSection === "overview" && (
                     <Pane
                       tabs={TIME_FILTERS}
@@ -593,7 +617,7 @@ const Page = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-6 mb-6">
             <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 overflow-hidden text-gray-900 flex flex-col gap-6">
               <div className="relative ">
                 <input
@@ -625,23 +649,42 @@ const Page = () => {
                 </label>
               </div>
 
-              <div className="flex gap-3 w-full ">
+              <div className="flex gap-3 w-full flex-col md:flex-row">
                 <div className="relative flex-1">
-                  <select
-                    id="category"
-                    className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
-                  >
-                    <option value=""> </option>
-                    <option value="Category 1">Category 1</option>
-                    <option value="Category 2">Category 2</option>
-                    <option value="Category 3">Category 3</option>
-                  </select>
-                  <label
-                    htmlFor="category"
-                    className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-indigo-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
-                  >
-                    Category
-                  </label>
+                  <Select.Root>
+                    <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2.5 w-full rounded-sm text-gray-600 border border-gray-300   hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                      <Select.Value placeholder="Select a category" />
+                      <FaAngleDown className="text-gray-500" />
+                    </Select.Trigger>
+
+                    <Select.Portal>
+                      <Select.Content className="bg-white rounded-md shadow-lg">
+                        <Select.Viewport className="p-1">
+                          {categoriesprod ? (
+                            categoriesprod.map((category) => (
+                              <Select.Item
+                                key={category}
+                                value={category}
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
+                              >
+                                <Select.ItemText>{category}</Select.ItemText>
+                              </Select.Item>
+                            ))
+                          ) : (
+                            <Select.Item
+                              value=""
+                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer rounded"
+                            >
+                              <Select.ItemText>
+                                No categories found. Create one
+                              </Select.ItemText>
+                            </Select.Item>
+                          )}
+                        </Select.Viewport>
+                        <Select.Arrow />
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select.Root>
                   <p
                     className="text-xs text-gray-500 mt-2 cursor-pointer"
                     onClick={() => setIsAddCategoryOpen(true)}
@@ -657,8 +700,7 @@ const Page = () => {
                     }}
                   />
                 </div>
-
-                <div className="relative w-1/2">
+                <div className="relative ">
                   <input
                     type="text"
                     id="unit"
@@ -1054,19 +1096,19 @@ const Page = () => {
             rows={[
               {
                 item: "Spoon",
-                date: "",
-                type: "",
-                quantity: 0,
-                addedBy: "",
-                status: "",
+                date: "21/09/2025",
+                type: "Income",
+                quantity: 10,
+                addedBy: "Admin",
+                status: "Active",
               },
               {
                 item: "Spoon",
-                date: "",
-                type: "",
-                quantity: 0,
-                addedBy: "",
-                status: "",
+                date: "21/09/2025",
+                type: "Expense",
+                quantity: 10,
+                addedBy: "Staff",
+                status: "Pending",
               },
             ]}
             onView={() => {}}
@@ -1149,6 +1191,9 @@ const Page = () => {
         onAddvariant={(variant: { name: string }) => {
           console.log(variant);
         }}
+        variantName={variantName}
+        setVariantName={setVariantName}
+        handleAddVariant={handleAddVariant}
       />
     </main>
   );

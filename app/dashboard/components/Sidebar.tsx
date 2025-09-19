@@ -78,7 +78,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white fixed top-0 px-2 w-65">
+    <div className="h-screen flex flex-col bg-white fixed top-0 px-2 w-65 z-50">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200 flex justify-center items-center w-full">
         <Image

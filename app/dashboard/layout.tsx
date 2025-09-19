@@ -29,7 +29,7 @@ export default function DashboardPage({
           <aside
             className={`md:block w-64 fixed ${
               !navOpen ? "-left-full" : "left-0"
-            } md:left-0 border-r bg-white z-10 transition-all duration-400 ease-in-out`}
+            } md:left-0 border-r bg-white z-10 transition-all duration-200 ease-in-out`}
           >
             <Sidebar />
           </aside>

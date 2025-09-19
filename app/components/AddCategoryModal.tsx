@@ -27,6 +27,10 @@ export function AddCategoryModal({
       setError("Category name is required");
       return;
     }
+    if (description.trim().length < 10) {
+      setError("Description must be at least 10 characters");
+      return;
+    }
     onAddCategory({
       name: categoryName.trim(),
       description: description.trim(),
@@ -79,6 +83,8 @@ export function AddCategoryModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              minLength={10}
+              required
             />
             <p className="text-xs text-gray-600 -mt-3">
               Enter a brief description. Minimum 10 characters required
