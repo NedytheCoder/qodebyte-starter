@@ -325,7 +325,7 @@ export function Switch({
       <input
         type="checkbox"
         value=""
-        // checked={checked}
+        checked={checked}
         className="sr-only peer disabled:opacity-50 disabled:cursor-not-allowed"
         {...props}
         // disabled={disabled}

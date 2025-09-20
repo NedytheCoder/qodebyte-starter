@@ -2,6 +2,7 @@
 
 import { RegularButton } from "@/app/components/Button";
 import {
+  Input,
   SectionTabInput,
   SelectDropdown,
   Switch,
@@ -241,6 +242,8 @@ const Page = () => {
     { name: string; values: string[] }[]
   >([]);
 
+  const [categoriesprod, setCategoriesProd] = useState<string[]>([]);
+
   const handleAddVariant = () => {
     const name = variantName.trim();
     if (!name) {
@@ -280,8 +283,6 @@ const Page = () => {
     { key: "delivered", label: "Delivered" },
     { key: "canceled", label: "Canceled" },
   ];
-
-  const categoriesprod = ["Shoes", "Clothing", "Electronics"];
 
   // Render header controls based on active section
   const renderHeaderControls = () => {
@@ -933,7 +934,13 @@ const Page = () => {
                 <div className="relative flex-1">
                   <Select.Root>
                     <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2.5 w-full rounded-sm text-gray-600 border border-gray-300   hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                      <Select.Value placeholder="Select a category" />
+                      <Select.Value
+                        placeholder={`${
+                          categoriesprod.length >= 1
+                            ? "Select a category"
+                            : "No categories found. Create one"
+                        }`}
+                      />
                       <FaAngleDown className="text-gray-500" />
                     </Select.Trigger>
 
@@ -975,8 +982,14 @@ const Page = () => {
                     isOpen={isAddCategoryOpen}
                     onClose={() => setIsAddCategoryOpen(false)}
                     onAddCategory={(category) => {
-                      console.log("New category:", category);
-                      // Add your logic to handle the new category
+                      setCategoriesProd((prev) =>
+                        prev.some(
+                          (c) => c.toLowerCase() === category.name.toLowerCase()
+                        )
+                          ? prev
+                          : [...prev, category.name]
+                      );
+                      setIsAddCategoryOpen(false);
                     }}
                   />
                 </div>
@@ -1147,11 +1160,18 @@ const Page = () => {
                       //     toast.error("Please select a category");
                       //   }
                       // }}
-                      onChange={() => setVariantManagement(!variantManagement)}
-                      // disabled={}
+                      checked={!variantManagement}
+                      onChange={() => {
+                        if (categoriesprod.length === 0) {
+                          toast.error("Please select a category");
+                        } else {
+                          setVariantManagement(!variantManagement);
+                        }
+                      }}
+                      disabled={categoriesprod.length === 0}
                     />
                   </div>
-                  {variantManagement && (
+                  {!variantManagement && (
                     <VariantSide
                       setIsAddVariantOpen={setIsAddVariantOpen}
                       variants={variants}
@@ -1161,28 +1181,73 @@ const Page = () => {
                 </>
               )}
               {hasVariation && (
-                <>
-                  <StockTable
-                    columns={[
-                      { key: "name", label: "Name" },
-                      { key: "costPrice", label: "Cost Price" },
-                      { key: "sellingPrice", label: "Selling Price" },
-                      { key: "quantity", label: "Quantity" },
-                      { key: "threshold", label: "Threshold" },
-                    ]}
-                    rows={[
-                      {
-                        name: "Color",
-                        costPrice: 100,
-                        sellingPrice: 150,
-                        quantity: 100,
-                        threshold: 100,
-                      },
-                    ]}
-                    onView={() => {}}
-                    onDelete={() => {}}
-                  />
-                </>
+                <div className={`overflow-hidden shadow rounded-lg`}>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Variant Name
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Cost Price
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Selling Price
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Quantity
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Threshold
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-gray-200 bg-white text-gray-500">
+                        <tr className="hover:bg-gray-50">
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="text"
+                              disabled
+                              value="Auto-generated"
+                              className="border border-gray-300 rounded-md p-2 w-20"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-20"
+                              placeholder="Cost Price"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-20"
+                              placeholder="Selling Price"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-20"
+                              placeholder="Quantity"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-20"
+                              value={10}
+                              disabled
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -1420,7 +1485,11 @@ const Page = () => {
         isOpen={isAddCategoryOpen}
         onClose={() => setIsAddCategoryOpen(false)}
         onAddCategory={(category) => {
-          console.log("New category:", category);
+          setCategoriesProd((prev) =>
+            prev.some((c) => c.toLowerCase() === category.name.toLowerCase())
+              ? prev
+              : [...prev, category.name]
+          );
           setIsAddCategoryOpen(false);
         }}
       />

@@ -239,51 +239,118 @@ export default function VariantSide({
             return preset + added === 0;
           });
 
-          if (hasAtLeastOneVariant && hasAnyEmpty) {
-            toast.error("Not complele");
+          if (!hasAtLeastOneVariant) {
+            toast.warning("Create a variant");
+            setGenerateClicked(false);
             return;
-          } else {
-            setGenerateClicked(true);
+          }
+          if (hasAnyEmpty) {
+            toast.warning("Add a variant");
+            setGenerateClicked(false);
+            return;
           }
 
+          setGenerateClicked(true);
           // TODO: proceed with generating combinations
         }}
       />
       {generateClicked && (
-        <StockTable
-          columns={[
-            { key: "variant", label: "Variant" },
-            { key: "costprice", label: "Cost Price" },
-            { key: "sellingprice", label: "Selling Price" },
-            { key: "quantity", label: "Quantity" },
-            { key: "threshold", label: "Threshold" },
-          ]}
-          rows={[
-            {
-              variant: "Color",
-              costprice: "$10",
-              sellingprice: "$20",
-              quantity: "10",
-              threshold: "2",
-            },
-            {
-              variant: "Size",
-              costprice: "$10",
-              sellingprice: "$20",
-              quantity: "10",
-              threshold: "2",
-            },
-          ]}
-          className="mt-4"
-        />
+        <div className="mt-6 space-y-6">
+          {savedVariants.map((variant) => {
+            const combinedValues = [
+              ...(variant.values ?? []),
+              ...(addedValues[variant.name] ?? []),
+            ];
+            return (
+              <div key={`variant-block-${variant.name}`} className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-900">
+                  {variant.name}
+                </h4>
+                {combinedValues.length === 0 && (
+                  <p className="text-xs text-gray-500">No subvariants added.</p>
+                )}
+                {combinedValues.map((sub) => (
+                  <div
+                    key={`variant-${variant.name}-sub-${sub}`}
+                    className="overflow-x-auto shadow rounded-lg"
+                  >
+                    <table className="min-w-full divide-y divide-gray-300 text-xs md:text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            {variant.name}: {sub}
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Cost Price
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Selling Price
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Quantity
+                          </th>
+                          <th className="py-3.5 px-3 text-left font-semibold text-gray-900">
+                            Threshold
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 bg-white text-gray-500">
+                        <tr className="hover:bg-gray-50">
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            {/* Subvariant label already shown in header; keep cell for layout */}
+                            <span className="text-gray-700">Details</span>
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-24"
+                              placeholder="Cost Price"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-24"
+                              placeholder="Selling Price"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-24"
+                              placeholder="Quantity"
+                            />
+                          </td>
+                          <td className={`whitespace-nowrap px-3 py-4 `}>
+                            <input
+                              type="number"
+                              className="border border-gray-300 rounded-md p-2 w-24"
+                              value={10}
+                              disabled
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
       )}
       <div className="flex flex-col">
         <div className="flex justify-between items-center mt-3">
           <p>Add image variant</p>{" "}
           <Switch
             onChange={() => {
-              setAddImageVariant(!addImageVariant);
+              if (generateClicked) {
+                setAddImageVariant(!addImageVariant);
+              } else {
+                toast.warning("Generate variant first");
+              }
             }}
+            disabled={!generateClicked}
             checked={addImageVariant}
           />
         </div>
