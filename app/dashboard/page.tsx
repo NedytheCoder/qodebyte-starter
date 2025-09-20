@@ -360,7 +360,7 @@ const Page = () => {
               </div>
             </div>
             {/* Sales overview */}
-            <div className="space-y-0 md:space-y-6 grid grid-cols-1 md:grid-cols-[1fr_2fr] text-gray-800 gap-4">
+            <div className="space-y-0 md:space-y-6 grid grid-cols-1 md:grid-cols-[1fr_2fr] text-gray-800 gap-6">
               {/* Sales Overview */}
               <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-3">

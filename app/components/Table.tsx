@@ -225,6 +225,7 @@ interface StockTableProps<T extends Record<string, unknown>> {
   onReport?: (item: T) => void;
   onView?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onRestock?: (item: T) => void;
   className?: string;
 }
 
@@ -235,6 +236,7 @@ export function StockTable<T extends Record<string, unknown>>({
   onReport,
   onView,
   onDelete,
+  onRestock,
   className,
 }: StockTableProps<T>) {
   if (rows.length === 0) {
@@ -296,7 +298,7 @@ export function StockTable<T extends Record<string, unknown>>({
                   );
                 })}
 
-                {(onEdit || onDelete || onView || onReport) && (
+                {(onEdit || onDelete || onView || onReport || onRestock) && (
                   <td className="whitespace-nowrap px-3 py-4 text-right">
                     {onEdit && (
                       <button
@@ -328,6 +330,14 @@ export function StockTable<T extends Record<string, unknown>>({
                         onClick={() => onReport(row)}
                       >
                         Report
+                      </button>
+                    )}
+                    {onRestock && (
+                      <button
+                        className="text-red-600 hover:text-red-900"
+                        onClick={() => onRestock(row)}
+                      >
+                        Restock
                       </button>
                     )}
                   </td>

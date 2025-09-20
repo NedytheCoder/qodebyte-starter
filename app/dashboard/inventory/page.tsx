@@ -19,10 +19,10 @@ import {
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { BsCart2 } from "react-icons/bs";
-import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa6";
+import { FaArrowDown, FaArrowRight, FaArrowUp, FaPlus } from "react-icons/fa6";
 import { Select } from "radix-ui";
 import { FaAngleDown } from "react-icons/fa";
-import { AiOutlineClose } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineStock } from "react-icons/ai";
 import { Pane } from "@/app/components/Tabpane";
 import { DateRangeModal } from "@/app/components/DateRangeModal";
 import { StockTable } from "@/app/components/Table";
@@ -40,6 +40,7 @@ import { AddTaxModal } from "@/app/components/AddTaxModal";
 import { AddDiscountModal } from "@/app/components/AddDiscountModal";
 import { AddCouponModal } from "@/app/components/AddCouponModal";
 import { ProductDetailsModal } from "@/app/components/ProductDetailsModal";
+import { FiBox } from "react-icons/fi";
 type StockTab = "all" | "purchased" | "sold" | "damaged" | "adjusted";
 
 const Page = () => {
@@ -616,38 +617,102 @@ const Page = () => {
           </div>
           <div className="">
             {/* Sales Overview */}
-            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-95 text-gray-800">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-sm font-semibold">Low Stock Items</h3>
-                  <p className="text-xs text-gray-600">
-                    Products that have reached threshold
-                  </p>
+            <div className="space-y-0 md:space-y-6 grid grid-cols-1 md:grid-cols-[1fr_2fr] text-gray-800 gap-6">
+              {/* Sales Overview */}
+              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+                <div className="flex justify-between gap-2">
+                  <div className="flex flex-col mb-3">
+                    <h3 className="text-sm font-semibold flex gap-2">
+                      <span className="text-red-500">
+                        <AiOutlineStock size={20} />
+                      </span>
+                      Low Stock Items
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                      Products that have reached threshold
+                    </p>
+                  </div>
+                  <div className="w-[43%]">
+                    <SelectDropdown
+                      options={[
+                        { value: "name-asc", label: "Check out list" },
+                        { value: "name-asc", label: "Name (A-Z)" },
+                        { value: "name-desc", label: "Name (Z-A)" },
+                        { value: "stock-asc", label: "Stock (Low to High)" },
+                        { value: "stock-desc", label: "Stock (High to Low)" },
+                      ]}
+                      placeholder="Sort by"
+                      className="w-full"
+                      onChange={(value) => {
+                        // Handle sort logic here
+                        console.log("Sort by:", value);
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="gap-3 hidden md:flex">
-                  <SelectDropdown
-                    options={[
-                      { value: "all", label: "Checkout List" },
-                      { value: "low_stock", label: "Low Stock" },
-                      { value: "out_stock", label: "Out Stock" },
+                <div className="overflow-x-auto">
+                  <StockTable
+                    rows={[{ name: "Cylinder", quantity: 250 }]}
+                    columns={[
+                      { key: "name", label: "Name" },
+                      { key: "quantity", label: "Quantity" },
                     ]}
-                    placeholder="Check out date"
-                    className="w-48"
-                    onChange={(value) => console.log("Category:", value)}
+                    onRestock={() => {}}
                   />
+
+                  <div>
+                    <p className="text-xs flex items-center gap-1 justify-end mt-5 text-green-500">
+                      View Dashboard Report <FaArrowRight size={12} />
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500">
-                      <th className="py-2">Product</th>
-                      <th className="py-2">Units Sold</th>
-                      <th className="py-2">Total Revenue</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+
+              {/* Inventory Status */}
+              <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-fit">
+                <div className="flex flex-col mb-3">
+                  <h3 className="text-sm font-semibold flex gap-1 items-center">
+                    <span className="">
+                      <FiBox size={20} />
+                    </span>
+                    Fast Moving Stock
+                  </h3>
+                  <p className="text-xs mt-1">
+                    Top-selling items based on recent sales performance:
+                  </p>
+                </div>
+                <div className="overflow-x-auto">
+                  <StockTable
+                    rows={[
+                      {
+                        rank: 1,
+                        item: "Laptop",
+                        category: "Electronics",
+                        units: 420,
+                        stock: 10,
+                        reorder: 70,
+                        revenue: "4000",
+                      },
+                    ]}
+                    columns={[
+                      { key: "rank", label: "Rank" },
+                      { key: "item", label: "Item/SKU" },
+                      { key: "category", label: "Category" },
+                      { key: "units", label: "Units Sold (Last 30 days)" },
+                      { key: "stock", label: "Current Stock" },
+                      { key: "reorder", label: "Reorder Level" },
+                      { key: "revenue", label: "Revenue Generated" },
+                    ]}
+                  />
+                  <div className="flex justify-between items-center mt-5 md:text-sm text-xs">
+                    <p className="text-xs text-gray-500">
+                      Last updated: Just now
+                    </p>
+                    <p className="text-xs flex items-center gap-1 justify-end text-green-500">
+                      View Dashboard Report <FaArrowRight size={12} />
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
