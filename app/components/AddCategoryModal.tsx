@@ -85,6 +85,7 @@ export function AddCategoryModal({
               rows={3}
               minLength={10}
               required
+              className="text-black p-1"
             />
             <p className="text-xs text-gray-600 -mt-3">
               Enter a brief description. Minimum 10 characters required

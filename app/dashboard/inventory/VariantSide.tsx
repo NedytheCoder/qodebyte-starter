@@ -141,7 +141,7 @@ export default function VariantSide({
                   (variantInputTypes[variant.name] ??
                     selectedVariant) as React.HTMLInputTypeAttribute
                 }
-                className="border border-gray-300 rounded p-2 w-full"
+                className="border border-gray-300 rounded p-2 w-full text-base md:text-sm"
                 value={variantInputs[variant.name] ?? ""}
                 onChange={(e) =>
                   setVariantInputs((prev) => ({
@@ -303,30 +303,29 @@ export default function VariantSide({
                           <td className={`whitespace-nowrap px-3 py-4 `}>
                             <input
                               type="number"
-                              className="border border-gray-300 rounded-md p-2 w-24"
+                              className="border border-gray-300 rounded-md p-2 w-24 text-base md:text-sm"
                               placeholder="Cost Price"
                             />
                           </td>
                           <td className={`whitespace-nowrap px-3 py-4 `}>
                             <input
                               type="number"
-                              className="border border-gray-300 rounded-md p-2 w-24"
+                              className="border border-gray-300 rounded-md p-2 w-24 text-base md:text-sm"
                               placeholder="Selling Price"
                             />
                           </td>
                           <td className={`whitespace-nowrap px-3 py-4 `}>
                             <input
                               type="number"
-                              className="border border-gray-300 rounded-md p-2 w-24"
+                              className="border border-gray-300 rounded-md p-2 w-24 text-base md:text-sm"
                               placeholder="Quantity"
                             />
                           </td>
                           <td className={`whitespace-nowrap px-3 py-4 `}>
                             <input
                               type="number"
-                              className="border border-gray-300 rounded-md p-2 w-24"
-                              value={10}
-                              disabled
+                              className="border border-gray-300 rounded-md p-2 w-24 text-base md:text-sm"
+                              placeholder="Threshold"
                             />
                           </td>
                         </tr>

@@ -10,3 +10,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-poppins);
 }
+
+input, textarea {
+  font-size: 16px !important;
+}

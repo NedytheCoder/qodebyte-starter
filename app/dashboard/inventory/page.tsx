@@ -244,6 +244,18 @@ const Page = () => {
 
   const [categoriesprod, setCategoriesProd] = useState<string[]>([]);
 
+  // New Inventory form fields
+  const [productName, setProductName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const baseSKU = useMemo(() => {
+    const p = (productName || "").trim().replace(/\s+/g, "");
+    const b = (brandName || "").trim().replace(/\s+/g, "");
+    const part1 = p.slice(0, 5);
+    const part2 = b.slice(0, 3);
+    if (part1 && part2) return `${part1}-${part2}`;
+    return part1 || part2 || "";
+  }, [productName, brandName]);
+
   const handleAddVariant = () => {
     const name = variantName.trim();
     if (!name) {
@@ -904,8 +916,10 @@ const Page = () => {
                 <input
                   type="text"
                   id="productName"
-                  className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                  className="block px-2.5 pb-2.5 pt-4 w-full text-base md:text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
                   placeholder=" "
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
                 />
                 <label
                   htmlFor="productName"
@@ -919,8 +933,10 @@ const Page = () => {
                 <input
                   type="text"
                   id="brand"
-                  className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                  className="block px-2.5 pb-2.5 pt-4 w-full text-base md:text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
                   placeholder=" "
+                  value={brandName}
+                  onChange={(e) => setBrandName(e.target.value)}
                 />
                 <label
                   htmlFor="brand"
@@ -933,7 +949,7 @@ const Page = () => {
               <div className="flex gap-3 w-full flex-col md:flex-row">
                 <div className="relative flex-1">
                   <Select.Root>
-                    <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2.5 w-full rounded-sm text-gray-600 border border-gray-300   hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <Select.Trigger className="flex items-center justify-between gap-2 shadow-sm p-2.5 w-full rounded-sm text-gray-600 border border-gray-300   hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-base md:text-sm">
                       <Select.Value
                         placeholder={`${
                           categoriesprod.length >= 1
@@ -997,7 +1013,7 @@ const Page = () => {
                   <input
                     type="text"
                     id="unit"
-                    className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
+                    className="block px-2.5 pb-2.5 pt-4 w-full text-base md:text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer"
                     placeholder=" "
                   />
                   <label
@@ -1017,10 +1033,11 @@ const Page = () => {
                   </span>
                 </p>
                 <input
-                  type="number"
+                  type="text"
                   id="threshold"
-                  className="block px-2.5 pb-3 pt-3 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer placeholder:text-[12px] mb-1"
+                  className="block px-2.5 pb-3 pt-3 w-full text-base md:text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-indigo-600 peer placeholder:text-[12px] mb-1"
                   placeholder="Auto-generated from product name"
+                  value={baseSKU}
                   disabled
                 />
                 <span className="flex items-center gap-1">
