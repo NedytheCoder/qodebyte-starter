@@ -13,12 +13,13 @@ import React, { useState, useMemo } from "react";
 import { FaTable } from "react-icons/fa";
 import {
   LineChart as AppLineChart,
-  PieChart as AppPieChart,
+  DonutChart as AppDonutChart,
+  HorizontalBarChart as AppHorizontalBarChart,
 } from "@/app/components/charts";
 import { toast } from "react-toastify";
 import Toast from "@/app/components/Toast";
 import { BsCart2 } from "react-icons/bs";
-import { FaArrowDown, FaPlus } from "react-icons/fa6";
+import { FaArrowDown, FaArrowUp, FaPlus } from "react-icons/fa6";
 import { Select } from "radix-ui";
 import { FaAngleDown } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
@@ -91,45 +92,45 @@ const Page = () => {
   const num = [
     {
       icon: <BsCart2 />,
-      label: "Gros Income",
-      value: 0,
-      percent: 0,
+      label: "Total Inventory Units",
+      value: "12,460 units",
+      percent: "-3%",
       direction: <FaArrowDown />,
     },
     {
       icon: <BsCart2 />,
-      label: "Total Discount",
-      value: 0,
-      percent: 0,
-      direction: <FaArrowDown />,
+      label: "Total Inventory Value",
+      value: "₦325,800",
+      percent: "+3%",
+      direction: <FaArrowUp />,
     },
     {
       icon: <BsCart2 />,
-      label: "Net Income",
-      value: 0,
-      percent: 0,
-      direction: <FaArrowDown />,
+      label: "Total Sell Value",
+      value: "₦590,460",
+      percent: "~45%",
+      direction: <FaArrowUp />,
     },
     {
       icon: <BsCart2 />,
-      label: "Inventry Count",
-      value: 0,
-      percent: 0,
-      direction: <FaArrowDown />,
+      label: "Out of Stock",
+      value: "18 SKUs",
+      percent: "~45%",
+      // direction: <FaArrowDown />,
     },
     {
       icon: <BsCart2 />,
-      label: "Staff on duty",
-      value: 0,
-      percent: 0,
-      direction: <FaArrowDown />,
+      label: "Low Stock",
+      value: "72 SKUs",
+      percent: "~45% ",
+      // direction: <FaArrowDown />,
     },
     {
       icon: <BsCart2 />,
-      label: "Total orders",
-      value: 0,
-      percent: 0,
-      direction: <FaArrowDown />,
+      label: "Days of Inventory (DOI)",
+      value: "12 days",
+      percent: "",
+      // direction: <FaArrowDown />,
     },
   ];
   const [activeSection, setActiveSection] = useState<SectionTab>("overview");
@@ -185,8 +186,20 @@ const Page = () => {
 
   const pieData = useMemo(
     () => [
-      { name: "Income", value: 20000000 },
+      { name: "Revenue", value: 20000000 },
       { name: "Expenses", value: 20000000 },
+    ],
+    []
+  );
+
+  // Category stock distribution data for Horizontal Bar Chart
+  const categoryStockData = useMemo(
+    () => [
+      { name: "Clothing", value: 120 },
+      { name: "Electronics", value: 80 },
+      { name: "Shoes", value: 64 },
+      { name: "Accessories", value: 40 },
+      { name: "Home", value: 30 },
     ],
     []
   );
@@ -398,7 +411,7 @@ const Page = () => {
           {/* Overview */}
           {activeSection === "overview" && (
             <>
-              {num.map((n) => (
+              {num.map((n, i) => (
                 <div
                   className="bg-white rounded-xl shadow-sm p-3 sm:p-6 text-gray-800 flex flex-col gap-5"
                   key={n.label}
@@ -407,12 +420,39 @@ const Page = () => {
                     <div className="border rounded-md p-2 w-fit">{n.icon}</div>
                   </div>
                   <div className="flex flex-col gap-1">
+                    <p className="text-xs md:text-sm text-gray-600">
+                      {n.label}
+                    </p>
                     <p className="text-sm md:text-md font-semibold">
                       {n.value}
                     </p>
-                    <div className="flex items-center gap-1 border w-fit p-1 rounded-md text-red-400">
-                      <p className="text-sm">{n.direction}</p>
-                      <p className="text-sm">{n.percent}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {i === 2 ? (
+                      <div className="text-xs text-gray-600">
+                        Marginal Potential: {n.percent}
+                      </div>
+                    ) : i === 3 || i === 4 || i === 5 ? (
+                      <div className="flex items-center gap-1">
+                        Indicator:{" "}
+                        <div
+                          className={`text-gray-600 ${
+                            i === 3
+                              ? "bg-red-400"
+                              : i === 4
+                              ? "bg-yellow-400"
+                              : "bg-green-400"
+                          } w-4 h-4 rounded-full`}
+                        ></div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 border w-fit p-1 rounded-md text-green-400">
+                        <p className="text-sm">{n.direction}</p>
+                        <p className="text-sm">{n.percent}</p>
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-600">
+                      {i < 2 && n.percent ? " vs last month" : ""}
                     </div>
                   </div>
                 </div>
@@ -495,7 +535,7 @@ const Page = () => {
 
               <div className="flex flex-col md:flex-row gap-10 items-center justify-center">
                 <div className="h-64 w-full md:w-1/2 md:mt-8">
-                  <AppPieChart
+                  <AppDonutChart
                     data={pieData}
                     dataKey="value"
                     xAxisKey="name"
@@ -505,6 +545,8 @@ const Page = () => {
                     width={"100%"}
                     className="h-full w-full"
                     colors={["#10B981", "#EF4444"]}
+                    centerLabel="40$"
+                    centerSubLabel="Profit"
                   />
                 </div>
                 <div className="flex flex-col gap-2 text-gray-800 w-full md:w-1/2">
@@ -513,11 +555,11 @@ const Page = () => {
                       {" "}
                       <p className="flex items-center gap-1 text-xs">
                         <span className="w-3 h-3 rounded-lg bg-green-500"></span>
-                        Available
+                        Revenue
                       </p>
                       <p className="flex items-center gap-1 text-xs">
                         <span className="w-3 h-3 rounded-lg bg-red-500"></span>
-                        Reserved
+                        Expenses
                       </p>
                     </div>
                     <div className="text-gray-800 w-full md:w-1/3 flex flex-col gap-1 text-xs">
@@ -534,36 +576,78 @@ const Page = () => {
               <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-95 text-gray-800">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-semibold">Low Stock Items</h3>
+                    <h3 className="text-sm font-semibold">
+                      Inventory by Category
+                    </h3>
                     <p className="text-xs text-gray-600">
-                      Products that have reached threshold
+                      Distribution of stock units across product categories
                     </p>
                   </div>
                   <div className="gap-3 hidden md:flex">
                     <SelectDropdown
                       options={[
-                        { value: "all", label: "Checkout List" },
-                        { value: "low_stock", label: "Low Stock" },
-                        { value: "out_stock", label: "Out Stock" },
+                        { value: "all", label: "Category" },
+                        { value: "clothing", label: "Clothing" },
+                        { value: "footwear", label: "Footwear" },
+                        { value: "accessories", label: "Accessories" },
                       ]}
-                      placeholder="Check out date"
+                      placeholder="Category"
                       className="w-48"
                       onChange={(value) => console.log("Category:", value)}
                     />
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead>
-                      <tr className="text-left text-gray-500">
-                        <th className="py-2">Product</th>
-                        <th className="py-2">Units Sold</th>
-                        <th className="py-2">Total Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
+                <div className="">
+                  <div className="h-64 w-96 md:w-1/2 md:mt-8">
+                    <AppHorizontalBarChart
+                      data={categoryStockData}
+                      dataKey="value"
+                      xAxisKey="value"
+                      yAxisKey="name"
+                      xLabel="Units of stock"
+                      yLabel="Category"
+                      height={"100%"}
+                      className="w-[80%] md:w-[190%] h-full"
+                    />
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div className="">
+            {/* Sales Overview */}
+            <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 h-95 text-gray-800">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="text-sm font-semibold">Low Stock Items</h3>
+                  <p className="text-xs text-gray-600">
+                    Products that have reached threshold
+                  </p>
+                </div>
+                <div className="gap-3 hidden md:flex">
+                  <SelectDropdown
+                    options={[
+                      { value: "all", label: "Checkout List" },
+                      { value: "low_stock", label: "Low Stock" },
+                      { value: "out_stock", label: "Out Stock" },
+                    ]}
+                    placeholder="Check out date"
+                    className="w-48"
+                    onChange={(value) => console.log("Category:", value)}
+                  />
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500">
+                      <th className="py-2">Product</th>
+                      <th className="py-2">Units Sold</th>
+                      <th className="py-2">Total Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
