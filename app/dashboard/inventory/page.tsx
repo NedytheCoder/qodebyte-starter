@@ -184,6 +184,17 @@ const Page = () => {
     ],
     []
   );
+  const lineData = useMemo(
+    () => [
+      { name: "09:00", time: "09:00", Stock: 3000 },
+      { name: "10:00", time: "10:00", Stock: 2500 },
+      { name: "11:00", time: "11:00", Stock: 6800 },
+      { name: "12:00", time: "12:00", Stock: 3200 },
+      { name: "01:00", time: "01:00", Stock: 8200 },
+      { name: "02:00", time: "02:00", Stock: 9800 },
+    ],
+    []
+  );
 
   const pieData = useMemo(
     () => [
@@ -497,10 +508,14 @@ const Page = () => {
               </div>
               <div>
                 <SelectDropdown
-                  placeholder="Available Products Graph"
                   options={[
-                    { value: "all", label: "Available Products Graph" },
+                    { value: "all", label: "All Products" },
+                    { value: "clothing", label: "Clothing" },
+                    { value: "footwear", label: "Footwear" },
+                    { value: "accessories", label: "Accessories" },
                   ]}
+                  placeholder="Category"
+                  className="w-48"
                   onChange={(value) => console.log("Category:", value)}
                 />
               </div>
@@ -508,8 +523,8 @@ const Page = () => {
 
             <div className="h-72">
               <AppLineChart
-                data={barData}
-                dataKey="income"
+                data={lineData}
+                dataKey="Stock"
                 xAxisKey="time"
                 showGrid
                 showLegend
@@ -635,11 +650,8 @@ const Page = () => {
                   <div className="w-[43%]">
                     <SelectDropdown
                       options={[
-                        { value: "name-asc", label: "Check out list" },
-                        { value: "name-asc", label: "Name (A-Z)" },
-                        { value: "name-desc", label: "Name (Z-A)" },
-                        { value: "stock-asc", label: "Stock (Low to High)" },
-                        { value: "stock-desc", label: "Stock (High to Low)" },
+                        { value: "low", label: "Low Stock" },
+                        { value: "high", label: "High Stock" },
                       ]}
                       placeholder="Sort by"
                       className="w-full"
@@ -690,7 +702,7 @@ const Page = () => {
                         category: "Electronics",
                         units: 420,
                         stock: 10,
-                        reorder: 70,
+                        threshold: 70,
                         revenue: "4000",
                       },
                     ]}
@@ -700,7 +712,7 @@ const Page = () => {
                       { key: "category", label: "Category" },
                       { key: "units", label: "Units Sold (Last 30 days)" },
                       { key: "stock", label: "Current Stock" },
-                      { key: "reorder", label: "Reorder Level" },
+                      { key: "threshold", label: "Threshold" },
                       { key: "revenue", label: "Revenue Generated" },
                     ]}
                   />
