@@ -31,6 +31,15 @@ import { BulkProductAdd } from "@/app/components/BulkProductAdd";
 import { BarChart as AppBarChart } from "@/app/components/charts";
 import { Bar } from "recharts";
 import VariantSide from "./VariantSide";
+import Configuration from "./Configuration";
+import { AddOrderModal } from "@/app/components/AddOrderModal";
+import { AddSupplierModal } from "@/app/components/AddSupplierModal";
+import { AddAttributeModal } from "@/app/components/AddAttributeModal";
+import { AddTaxModal } from "@/app/components/AddTaxModal";
+import { AddDiscountModal } from "@/app/components/AddDiscountModal";
+import { AddCouponModal } from "@/app/components/AddCouponModal";
+import { ProductDetailsModal } from "@/app/components/ProductDetailsModal";
+type StockTab = "all" | "purchased" | "sold" | "damaged" | "adjusted";
 
 const Page = () => {
   type TimeFilter =
@@ -51,6 +60,18 @@ const Page = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isAddVariantOpen, setIsAddVariantOpen] = useState(false);
+  const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
+  const [isAddSupplierOpen, setIsAddSupplierOpen] = useState(false);
+  const [isAddAttributeOpen, setIsAddAttributeOpen] = useState(false);
+  const [isAddTaxOpen, setIsAddTaxOpen] = useState(false);
+  const [isAddDiscountOpen, setIsAddDiscountOpen] = useState(false);
+  const [isAddCouponOpen, setIsAddCouponOpen] = useState(false);
+  const [activeStock, setActiveStock] = useState<StockTab>("all");
+  const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
 
   const TIME_FILTERS: { key: TimeFilter; label: string }[] = [
     { key: "today", label: "Today" },
@@ -112,6 +133,14 @@ const Page = () => {
     },
   ];
   const [activeSection, setActiveSection] = useState<SectionTab>("overview");
+  type ConfigureTab =
+    | "category"
+    | "attributes"
+    | "taxes"
+    | "discounts"
+    | "coupons";
+  const [activeConfigure, setActiveConfigure] =
+    useState<ConfigureTab>("category");
 
   type SectionTab =
     | "overview"
@@ -131,6 +160,14 @@ const Page = () => {
     { key: "shoes", label: "Shoes" },
     { key: "clothing", label: "Clothing" },
     { key: "electronics", label: "Electronics" },
+  ];
+
+  const stock: { key: StockTab; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "purchased", label: "Purchased" },
+    { key: "sold", label: "Sold" },
+    { key: "damaged", label: "Damaged" },
+    { key: "adjusted", label: "Adjusted" },
   ];
 
   const barData = useMemo(
@@ -219,16 +256,106 @@ const Page = () => {
     { key: "canceled", label: "Canceled" },
   ];
 
-  const configureTabs = [
-    { key: "category", label: "Category" },
-    { key: "attributes", label: "Attributes" },
-    { key: "taxes", label: "Taxes" },
-    { key: "discounts", label: "Discounts" },
-    { key: "coupons", label: "Coupons" },
-  ];
-  const [activeConfigure, setActiveConfigure] = useState("category");
-
   const categoriesprod = ["Shoes", "Clothing", "Electronics"];
+
+  // Render header controls based on active section
+  const renderHeaderControls = () => {
+    switch (activeSection) {
+      case "overview":
+        return (
+          <Pane
+            tabs={TIME_FILTERS}
+            setActiveSection={(section: TimeFilter) => setActiveTime(section)}
+            activeSection={activeTime}
+            setShowDateModal={(show: boolean): void => {
+              setShowDateModal(show);
+            }}
+          />
+        );
+      case "products":
+        return !addProduct ? (
+          <RegularButton
+            onClick={() => setAddProduct(true)}
+            label={
+              <p className="text-sm flex items-center">
+                <FaPlus /> Add Product
+              </p>
+            }
+            className="text-sm"
+          />
+        ) : (
+          <RegularButton
+            onClick={() => setAddProduct(false)}
+            label={
+              <p className="text-sm flex items-center gap-2">
+                <FaTable /> Show Table
+              </p>
+            }
+            className="text-sm"
+          />
+        );
+      case "configuration": {
+        const labelMap: Record<ConfigureTab, string> = {
+          category: "+ Add category",
+          attributes: "+ Add attribute",
+          taxes: "+ Add tax",
+          discounts: "+ Add discount",
+          coupons: "+ Add coupon",
+        };
+        return (
+          <RegularButton
+            onClick={() => {
+              switch (activeConfigure) {
+                case "category":
+                  setIsAddCategoryOpen(true);
+                  break;
+                case "attributes":
+                  setIsAddAttributeOpen(true);
+                  break;
+                case "taxes":
+                  setIsAddTaxOpen(true);
+                  break;
+                case "discounts":
+                  setIsAddDiscountOpen(true);
+                  break;
+                case "coupons":
+                  setIsAddCouponOpen(true);
+                  break;
+              }
+            }}
+            label={<p className="text-sm">{labelMap[activeConfigure]}</p>}
+            className="text-sm"
+          />
+        );
+      }
+      case "order":
+        return (
+          <RegularButton
+            onClick={() => setIsAddOrderOpen(true)}
+            label={<p className="text-sm">+ Add Order</p>}
+            className="text-sm"
+          />
+        );
+      case "stock":
+        return (
+          <RegularButton
+            onClick={() => setIsAddSupplierOpen(true)}
+            label={<p className="text-sm">+ Add supplier</p>}
+            className="text-sm"
+          />
+        );
+      case "configuration":
+        return (
+          <RegularButton
+            onClick={() => console.log("Add configuration clicked")}
+            label={<p className="text-sm">+ Add configuration</p>}
+            className="text-sm"
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <main className="flex-1 w-full md:ml-64">
@@ -243,41 +370,8 @@ const Page = () => {
           <div className={`w-full md:flex md:justify-end md:mb-2`}>
             <div className="w-full md:w-auto border rounded-lg">
               <div className="overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <div className="flex gap-2 mt-2 md:mt-0 mb-6 ">
-                  {activeSection === "overview" && (
-                    <Pane
-                      tabs={TIME_FILTERS}
-                      setActiveSection={(section: TimeFilter) =>
-                        setActiveTime(section)
-                      }
-                      activeSection={activeTime}
-                      setShowDateModal={(show: boolean): void => {
-                        setShowDateModal(show);
-                      }}
-                    />
-                  )}
-                  {activeSection === "products" && !addProduct && (
-                    <RegularButton
-                      onClick={() => setAddProduct(true)}
-                      label={
-                        <p className="text-sm flex items-center">
-                          <FaPlus /> Add Product
-                        </p>
-                      }
-                      className="text-sm"
-                    />
-                  )}
-                  {activeSection === "products" && addProduct && (
-                    <RegularButton
-                      onClick={() => setAddProduct(false)}
-                      label={
-                        <p className="text-sm flex items-center gap-2">
-                          <FaTable /> Show Table
-                        </p>
-                      }
-                      className="text-sm"
-                    />
-                  )}
+                <div className="flex gap-2 mt-2 md:mt-0 mb-6 md:mb-0 ">
+                  {renderHeaderControls()}
 
                   <DateRangeModal
                     isOpen={showDateModal}
@@ -300,7 +394,7 @@ const Page = () => {
           </div>
         </div>
         {/* Lower grid: Pie + two tables */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-4 mt-3">
           {/* Overview */}
           {activeSection === "overview" && (
             <>
@@ -535,8 +629,8 @@ const Page = () => {
                   label: "Base SKU",
                 },
                 {
-                  key: "productName",
-                  label: "Product Name",
+                  key: "item",
+                  label: "Item",
                 },
                 {
                   key: "category",
@@ -545,6 +639,14 @@ const Page = () => {
                 {
                   key: "brand",
                   label: "Brand",
+                },
+                {
+                  key: "quantity",
+                  label: "Quantity",
+                },
+                {
+                  key: "status",
+                  label: "Status",
                 },
                 {
                   key: "threshold",
@@ -558,22 +660,39 @@ const Page = () => {
               rows={[
                 {
                   baseSKU: "123456",
-                  productName: "Product 1",
+                  item: "Item 1",
                   category: "Clothing",
                   brand: "Brand 1",
+                  quantity: 8,
+                  status: "LOW",
                   threshold: 10,
                   hasVariation: "Yes",
                 },
                 {
                   baseSKU: "123456",
-                  productName: "Product 1",
+                  item: "Item 2",
                   category: "Electronics",
-                  brand: "Brand 1",
+                  brand: "Brand 2",
+                  quantity: 10,
+                  status: "Out of Stock",
+                  threshold: 10,
+                  hasVariation: "No",
+                },
+                {
+                  baseSKU: "123456",
+                  item: "Item 2",
+                  category: "Electronics",
+                  brand: "Brand 2",
+                  quantity: 10,
+                  status: "FULL",
                   threshold: 10,
                   hasVariation: "No",
                 },
               ]}
-              onView={() => console.log("View")}
+              onView={(row) => {
+                setSelectedProduct(row as Record<string, unknown>);
+                setIsProductDetailsOpen(true);
+              }}
               onDelete={() => console.log("Delete")}
             />
 
@@ -1012,129 +1131,35 @@ const Page = () => {
       )}
 
       {activeSection === "stock" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
-          {/* Big Bar Chart */}
-          <div className="p-4 sm:p-1 overflow-hidden md:mb-7 mb-4 mt-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                  Stocks
-                </h3>
-                <p className="text-xs text-gray-500 mb-4">
-                  Monitor the flow of your inventory in and out of the storage
-                </p>
-              </div>
-              <div className="text-gray-900 flex flex-col md:flex-row items-center md:items-start gap-2">
-                <p className="flex items-center gap-1 text-xs md:text-base">
-                  <span className="w-3 h-3 rounded-lg bg-green-500"></span>
-                  Income
-                </p>
-                <p className="flex items-center gap-1 text-xs md:text-base">
-                  <span className="w-3 h-3 rounded-lg bg-red-500"></span>
-                  Expenses
-                </p>
-              </div>
-            </div>
-
-            <div className="h-72 mt-3 md:mt-0">
-              <AppBarChart
-                data={barData}
-                dataKey="income"
-                xAxisKey="time"
-                title="Income and Expenses"
-                description="Daily income and expenses overview"
-                width="100%"
-                height="100%"
-                className="h-full"
-                fillColor="#10B981"
-                strokeColor="#10B981"
-                showLegend={false}
-              >
-                <Bar
-                  dataKey="expenses"
-                  name="Expenses"
-                  fill="#EF4444"
-                  stroke="#EF4444"
-                />
-              </AppBarChart>
+        <div className="space-y-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="md:text-lg text-sm font-semibold text-gray-900">
+                Stock Management
+              </h2>
+              <p className="text-xs md:text-sm text-gray-500">
+                Manage your inventory and track stock levels
+              </p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
-            <div className="flex items-center gap-2 justify-between w-full">
-              <div className="relative flex-1">
-                <SectionTabInput placeholder="Search by Order Name / ID" />
-              </div>
-              <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
-                <SelectDropdown
-                  options={[
-                    { value: "name-asc", label: "Name (A-Z)" },
-                    { value: "name-desc", label: "Name (Z-A)" },
-                    { value: "stock-asc", label: "Stock (Low to High)" },
-                    { value: "stock-desc", label: "Stock (High to Low)" },
-                  ]}
-                  placeholder="Sort by"
-                  className="w-full"
-                  onChange={(value) => {
-                    // Handle sort logic here
-                    console.log("Sort by:", value);
-                  }}
-                />
-              </div>
-            </div>
+          {/* Category Tabs */}
+          <div>
+            <nav className="flex bg-white gap-5 md:w-fit" aria-label="Tabs">
+              <Pane
+                tabs={stock}
+                setActiveSection={(section: StockTab): void => {
+                  setActiveStock(section);
+                }}
+                activeSection={activeStock}
+              />
+            </nav>
           </div>
-
-          <StockTable
-            columns={[
-              { key: "item", label: "Item" },
-              { key: "date", label: "Date" },
-              { key: "type", label: "Type" },
-              { key: "quantity", label: "Quantity" },
-              { key: "addedBy", label: "Added By" },
-              { key: "status", label: "Status" },
-            ]}
-            rows={[
-              {
-                item: "Spoon",
-                date: "21/09/2025",
-                type: "Income",
-                quantity: 10,
-                addedBy: "Admin",
-                status: "Active",
-              },
-              {
-                item: "Spoon",
-                date: "21/09/2025",
-                type: "Expense",
-                quantity: 10,
-                addedBy: "Staff",
-                status: "Pending",
-              },
-            ]}
-            onView={() => {}}
-            className="mb-6"
-          />
-        </div>
-      )}
-
-      {activeSection === "configuration" && (
-        <div className="space-y-6 px-4 sm:px-6 lg:px-8 ">
-          {/* Big Bar Chart */}
-          <div className="mt-4 md:w-fit">
-            <Pane
-              tabs={configureTabs}
-              setActiveSection={(section: string) =>
-                setActiveConfigure(section)
-              }
-              activeSection={activeConfigure}
-            />
-          </div>
-
           {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row justify-between gap-0 md:gap-4">
             <div className="flex items-center gap-2 justify-between w-full">
               <div className="relative flex-1">
-                <SectionTabInput placeholder="Search by Category" />
+                <SectionTabInput placeholder="Search by Inventory Name / Category" />
               </div>
               <div className="hidden md:flex items-center gap-2 text-gray-800 w-48">
                 <SelectDropdown
@@ -1156,34 +1181,132 @@ const Page = () => {
           </div>
 
           {/* Stock Table */}
+
           <StockTable
             columns={[
-              { key: "categoryId", label: "Category ID" },
-              { key: "category", label: "Category" },
+              { key: "date", label: "Date" },
+              { key: "item", label: "Item" },
+              { key: "type", label: "Type" },
+              { key: "quantity", label: "Quantity" },
+              { key: "addedBy", label: "Added By" },
+              { key: "status", label: "Status" },
+              { key: "lastupdated", label: "Last Updated" },
             ]}
             rows={[
               {
-                categoryId: "#ORD-2023-1001",
-                category: "FlameTech Energy",
+                date: "2023-06-02",
+                item: "Gas Cylinder",
+                type: "Purchased",
+                quantity: 10,
+                addedBy: "John Doe",
+                status: "IN",
+                lastupdated: "2 hours ago",
+              },
+              {
+                date: "2023-06-02",
+                item: "Water Bottle",
+                type: "Damaged",
+                quantity: 25,
+                addedBy: "John Doe",
+                status: "OUT",
+                lastupdated: "1 day ago",
+              },
+              {
+                date: "2023-06-02",
+                item: "Water Bottle",
+                type: "Sold",
+                quantity: 25,
+                addedBy: "John Doe",
+                status: "DAMAGED",
+                lastupdated: "1 day ago",
               },
             ]}
-            onView={() => {}}
-            onReport={() => {}}
-          />
-
-          {/* Pagination */}
-          <Pagination
-            currentPage={1}
-            totalPages={2}
-            onPageChange={(page) => console.log("Page changed to:", page)}
-            label={
-              <>
-                <p>Time Stock: 0</p>
-              </>
-            }
+            onEdit={(row) => console.log("Edit", row)}
+            onDelete={(row) => console.log("Delete", row)}
           />
         </div>
       )}
+
+      {activeSection === "configuration" && (
+        <Configuration
+          activeConfigure={activeConfigure}
+          onChangeConfigure={(section: string) =>
+            setActiveConfigure(section as ConfigureTab)
+          }
+        />
+      )}
+
+      <AddOrderModal
+        isOpen={isAddOrderOpen}
+        onClose={() => setIsAddOrderOpen(false)}
+        onAddOrder={(order) => {
+          console.log("New order:", order);
+          setIsAddOrderOpen(false);
+        }}
+      />
+
+      <AddSupplierModal
+        isOpen={isAddSupplierOpen}
+        onClose={() => setIsAddSupplierOpen(false)}
+        onAddSupplier={(supplier) => {
+          console.log("New supplier:", supplier);
+          setIsAddSupplierOpen(false);
+        }}
+      />
+
+      {/* Configuration Modals */}
+      <AddCategoryModal
+        isOpen={isAddCategoryOpen}
+        onClose={() => setIsAddCategoryOpen(false)}
+        onAddCategory={(category) => {
+          console.log("New category:", category);
+          setIsAddCategoryOpen(false);
+        }}
+      />
+      <AddAttributeModal
+        isOpen={isAddAttributeOpen}
+        onClose={() => setIsAddAttributeOpen(false)}
+        onAddAttribute={(attribute) => {
+          console.log("New attribute:", attribute);
+          setIsAddAttributeOpen(false);
+        }}
+      />
+      <AddTaxModal
+        isOpen={isAddTaxOpen}
+        onClose={() => setIsAddTaxOpen(false)}
+        onAddTax={(tax) => {
+          console.log("New tax:", tax);
+          setIsAddTaxOpen(false);
+        }}
+      />
+      <AddDiscountModal
+        isOpen={isAddDiscountOpen}
+        onClose={() => setIsAddDiscountOpen(false)}
+        onAddDiscount={(discount) => {
+          console.log("New discount:", discount);
+          setIsAddDiscountOpen(false);
+        }}
+      />
+      <AddCouponModal
+        isOpen={isAddCouponOpen}
+        onClose={() => setIsAddCouponOpen(false)}
+        onAddCoupon={(coupon) => {
+          console.log("New coupon:", coupon);
+          setIsAddCouponOpen(false);
+        }}
+      />
+
+      {/* Product Details Modal */}
+      <ProductDetailsModal
+        isOpen={isProductDetailsOpen}
+        onClose={() => {
+          setIsProductDetailsOpen(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+        title="Product Details"
+      />
+
       <Toast />
       <AddCustomVariant
         isOpen={isAddVariantOpen}

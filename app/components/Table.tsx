@@ -219,7 +219,7 @@ export function Table<T extends object>({
 }
 
 interface StockTableProps<T extends Record<string, unknown>> {
-  columns: { key: keyof T; label: string }[];
+  columns: ReadonlyArray<{ key: keyof T; label: string }>;
   rows: T[];
   onEdit?: (item: T) => void;
   onReport?: (item: T) => void;
@@ -268,25 +268,33 @@ export function StockTable<T extends Record<string, unknown>>({
           <tbody className="divide-y divide-gray-200 bg-white text-gray-500">
             {rows.map((row, idx) => (
               <tr key={idx} className="hover:bg-gray-50">
-                {columns.map((col) => (
-                  <td
-                    key={String(col.key)}
-                    className={`whitespace-nowrap px-3 py-4 `}
-                  >
-                    <p
-                      className={`${
-                        row[col.key as keyof T] === "IN" && "text-green-500"
-                      } ${
-                        row[col.key as keyof T] === "OUT" && "text-red-500"
-                      } ${
-                        row[col.key as keyof T] === "DAMAGED" &&
-                        "text-yellow-500"
-                      }`}
+                {columns.map((col) => {
+                  const raw = row[col.key as keyof T];
+                  const text = String(raw ?? "");
+                  const normalized = text.toString().trim().toLowerCase();
+                  // extended status coloring
+                  const colorClass =
+                    raw === "IN" ||
+                    normalized === "high" ||
+                    normalized === "full"
+                      ? "text-green-500"
+                      : raw === "OUT" ||
+                        normalized === "low" ||
+                        normalized === "out of stock"
+                      ? "text-red-500"
+                      : raw === "DAMAGED"
+                      ? "text-yellow-500"
+                      : "";
+
+                  return (
+                    <td
+                      key={String(col.key)}
+                      className={`whitespace-nowrap px-3 py-4 `}
                     >
-                      {String(row[col.key as keyof T] ?? "")}
-                    </p>
-                  </td>
-                ))}
+                      <p className={`${colorClass}`}>{text}</p>
+                    </td>
+                  );
+                })}
 
                 {(onEdit || onDelete || onView || onReport) && (
                   <td className="whitespace-nowrap px-3 py-4 text-right">
