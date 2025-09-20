@@ -1256,8 +1256,7 @@ const Page = () => {
                             <input
                               type="number"
                               className="border border-gray-300 rounded-md p-2 w-20"
-                              value={10}
-                              disabled
+                              placeholder="Threshold"
                             />
                           </td>
                         </tr>
