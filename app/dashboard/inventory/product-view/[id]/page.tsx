@@ -216,7 +216,7 @@ const Page = () => {
 
               <div>
                 <p className="text-sm font-semibold text-gray-800">
-                  Variant 1 - 'ff'
+                  Variant 1 - &apos;ff&apos;
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
                   <div>
