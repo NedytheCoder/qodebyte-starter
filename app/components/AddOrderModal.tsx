@@ -8,6 +8,7 @@ import { AiOutlineShoppingCart } from "react-icons/ai";
 
 export interface OrderItem {
   product: string;
+  variant?: string;
   quantity: number;
 }
 
@@ -34,29 +35,90 @@ export function AddOrderModal({
   const [expectedDate, setExpectedDate] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState("");
+  const [selectedVariant, setSelectedVariant] = useState("");
   const [qty, setQty] = useState<number>(1);
   const [items, setItems] = useState<OrderItem[]>([]);
 
   const [error, setError] = useState<string>("");
 
-  const canAddItem = useMemo(
-    () => selectedProduct && qty > 0,
-    [selectedProduct, qty]
-  );
+  // Variant dimensions per product: { [product]: { [dimensionName]: string[] } }
+  const productVariantMatrix: Record<string, Record<string, string[]>> = {
+    // Examples; replace with real data source as needed
+    gas_cylinder: {
+      Color: ["Red", "Blue"],
+      Size: ["Medium", "Large"],
+    },
+    water_bottle: {
+      Size: ["Small"],
+      Material: ["Cotton"],
+    },
+    match_box: {
+      Color: ["Blue"],
+      Size: ["Large"],
+    },
+  };
+
+  // Generate cartesian combinations for a product's variant dimensions
+  const generateVariantCombinations = (
+    dims: Record<string, string[]>
+  ): Array<Record<string, string>> => {
+    const keys = Object.keys(dims);
+    if (keys.length === 0) return [];
+    let combos: Array<Record<string, string>> = [{}];
+    for (const k of keys) {
+      const next: Array<Record<string, string>> = [];
+      for (const combo of combos) {
+        for (const val of dims[k]) {
+          next.push({ ...combo, [k]: val });
+        }
+      }
+      combos = next;
+    }
+    return combos;
+  };
+
+  // Options for the variant dropdown for the selected product
+  const variantOptions = useMemo(() => {
+    const dims = productVariantMatrix[selectedProduct];
+    if (!dims || Object.keys(dims).length === 0) return [];
+    const combos = generateVariantCombinations(dims);
+    return [
+      { value: "", label: "Select Variant" },
+      ...combos.map((obj) => {
+        const label = Object.keys(obj)
+          .sort()
+          .map((k) => `${k}: ${obj[k]}`)
+          .join(" / ");
+        return { value: label, label };
+      }),
+    ];
+  }, [selectedProduct]);
+
+  const canAddItem = useMemo(() => {
+    const hasVariantOptions = variantOptions.length > 1; // includes placeholder
+    const variantOk = !hasVariantOptions || !!selectedVariant;
+    return !!selectedProduct && qty > 0 && variantOk;
+  }, [selectedProduct, selectedVariant, qty, variantOptions]);
 
   const handleAddItem = () => {
     if (!canAddItem) return;
     setItems((prev) => {
       // merge quantities if product already exists
-      const idx = prev.findIndex((i) => i.product === selectedProduct);
+      const idx = prev.findIndex(
+        (i) => i.product === selectedProduct && i.variant === selectedVariant
+      );
       if (idx >= 0) {
         const next = [...prev];
         next[idx] = { ...next[idx], quantity: next[idx].quantity + qty };
         return next;
       }
-      return [...prev, { product: selectedProduct, quantity: qty }];
+      return [
+        ...prev,
+        { product: selectedProduct, variant: selectedVariant || undefined, quantity: qty },
+      ];
     });
     setSelectedProduct("");
+    setSelectedVariant("");
     setQty(1);
   };
 
@@ -83,7 +145,7 @@ export function AddOrderModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex justify-center items-center">
+    <div className="fixed inset-0 z-50 overflow-hidden flex justify-center items-center text-gray-700">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
@@ -174,7 +236,7 @@ export function AddOrderModal({
           <div className="space-y-3">
             <p className="text-sm font-semibold text-gray-800">Products</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_2fr] gap-3 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_2fr_1fr_2fr] gap-3 items-end">
               {/* Product Select */}
               <div>
                 <SelectDropdown
@@ -186,9 +248,25 @@ export function AddOrderModal({
                     { value: "match_box", label: "Match Box" },
                   ]}
                   value={selectedProduct}
-                  onChange={(value) => setSelectedProduct(value)}
+                  onChange={(value) => {
+                    setSelectedProduct(value);
+                    setSelectedVariant("");
+                  }}
                   placeholder="Select Product"
                 />
+              </div>
+
+              {/* Variant Select (appears when a product is selected and has variant combinations) */}
+              <div>
+                {selectedProduct && variantOptions.length > 1 && (
+                  <SelectDropdown
+                    label={<span className="text-xs text-gray-700">Variant</span>}
+                    options={variantOptions}
+                    value={selectedVariant}
+                    onChange={(value) => setSelectedVariant(value)}
+                    placeholder="Select Variant"
+                  />
+                )}
               </div>
 
               {/* Quantity stepper */}
@@ -252,6 +330,9 @@ export function AddOrderModal({
                       <span className="font-medium capitalize">
                         {it.product.replace(/_/g, " ")}
                       </span>
+                      {it.variant && (
+                        <span className="text-gray-500">Variant: {it.variant}</span>
+                      )}
                       <span className="text-gray-500">Qty: {it.quantity}</span>
                     </div>
                     <button
